@@ -1,0 +1,216 @@
+Thu Oct 31 12:33:12 2019
+
+
+Moral links:
+
+
+
+Necessary fill-ins:
+
+
+
+Triangulating prime component with 2 members:
+    Height, Group
+This component is a clique of cost 6
+
+Triangulating prime component with 2 members:
+    Weight, Group
+This component is a clique of cost 6
+
+
+Total cost of triangulation for all prime components is 12
+
+
+Elimination sequence:
+
+    Height
+    Weight
+    Group
+
+
+Cliques:
+
+Clique 2, 2 members, table size = 2 + 4:
+    Group, Weight
+
+Clique 1, 2 members, table size = 2 + 4:
+    Group, Height
+
+Total clique table size: 4 + 8
+
+
+The junction forest:
+
+Creating junction tree with clique 2 as root ...
+
+Cliques 1 and 2 linked, separator has 1 member and table size = 2:
+    Group
+
+
+Assignment of potentials to cliques:
+
+    Node Weight assigned to clique 2
+    Node Height assigned to clique 1
+    Node Group assigned to clique 2
+
+
+Checking conditional probability potentials:
+
+    No errors found
+
+
+Beliefs for chance nodes:
+
+    Weight:
+	Mean: 68   Variance: 31   SD: 5.56776
+
+    Height:
+	Mean: 176   Variance: 101   SD: 10.0499
+
+    Group:
+	Latin      0.7
+	Slavic     0.3
+Thu Oct 31 12:33:59 2019
+
+
+Moral links:
+
+
+
+Necessary fill-ins:
+
+
+
+Triangulating prime component with 2 members:
+    Height, Group
+This component is a clique of cost 6
+
+Triangulating prime component with 2 members:
+    Weight, Group
+This component is a clique of cost 6
+
+
+Total cost of triangulation for all prime components is 12
+
+
+Elimination sequence:
+
+    Height
+    Weight
+    Group
+
+
+Cliques:
+
+Clique 2, 2 members, table size = 2 + 4:
+    Group, Weight
+
+Clique 1, 2 members, table size = 2 + 4:
+    Group, Height
+
+Total clique table size: 4 + 8
+
+
+The junction forest:
+
+Creating junction tree with clique 2 as root ...
+
+Cliques 1 and 2 linked, separator has 1 member and table size = 2:
+    Group
+
+
+Assignment of potentials to cliques:
+
+    Node Weight assigned to clique 2
+    Node Height assigned to clique 1
+    Node Group assigned to clique 2
+
+
+Checking conditional probability potentials:
+
+    No errors found
+
+
+Beliefs for chance nodes:
+
+    Weight:
+	Mean: 68   Variance: 31   SD: 5.56776
+
+    Height:
+	Mean: 176   Variance: 94   SD: 9.69536
+
+    Group:
+	Latin      0.7
+	Slavic     0.3
+Thu Oct 31 12:35:41 2019
+
+
+Moral links:
+
+
+
+Necessary fill-ins:
+
+
+
+Triangulating prime component with 2 members:
+    Height, Group
+This component is a clique of cost 6
+
+Triangulating prime component with 2 members:
+    Weight, Group
+This component is a clique of cost 6
+
+
+Total cost of triangulation for all prime components is 12
+
+
+Elimination sequence:
+
+    Height
+    Weight
+    Group
+
+
+Cliques:
+
+Clique 2, 2 members, table size = 2 + 4:
+    Group, Weight
+
+Clique 1, 2 members, table size = 2 + 4:
+    Group, Height
+
+Total clique table size: 4 + 8
+
+
+The junction forest:
+
+Creating junction tree with clique 2 as root ...
+
+Cliques 1 and 2 linked, separator has 1 member and table size = 2:
+    Group
+
+
+Assignment of potentials to cliques:
+
+    Node Weight assigned to clique 2
+    Node Height assigned to clique 1
+    Node Group assigned to clique 2
+
+
+Checking conditional probability potentials:
+
+    No errors found
+
+
+Beliefs for chance nodes:
+
+    Weight:
+	Mean: 68   Variance: 31   SD: 5.56776
+
+    Height:
+	Mean: 176   Variance: 101   SD: 10.0499
+
+    Group:
+	Latin      0.7
+	Slavic     0.3

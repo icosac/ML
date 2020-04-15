@@ -1,0 +1,220 @@
+\chapter{Linear Algebra}
+
+\begin{definition}[Vector Space]
+A set $\mathcal{X}$ is called a vector space over $\mathbb{R}$ if addition and scalar multiplication are defined and, for all $\vect{x},\vect{y},\vect{z}\in\mathbb{X}$ and $\lambda,\mu\in\mathbb{R}$, satisfy the following properties:
+\begin{itemize}
+	\item Addition:
+		\begin{itemize}
+			\item \textit{Associative}: $\vect{x}+(\vect{y}+\vect{z})=(\vect{x}+\vect{y})+\vect{z}$
+			\item \textit{Commutative}: $\vect{x}+\vect{y}=\vect{y}+\vect{x}$
+			\item \textit{Identity element}: $\exists 0\in\mathcal{X}:\vect{x}+0=\vect{x}$
+			\item \textit{Inverse element}: $\forall\vect{x}\in\mathcal{X}\exists\vect{x'}\in\mathcal{X}:\vect{x}+\vect{x'}=0$
+		\end{itemize}
+	\item Scalar multiplication:
+		\begin{itemize}	
+			\item \textit{Distributive over elements}: $\lambda(\vect{x}+\vect{y}=\lambda\vect{x}+\lambda\vect{y}$
+			\item \textit{Distributive over scalars}: $(\lambda+\mu)\vec{x}=\lambda\vect{x}+\mu\vect{{x}}$
+			\item \textit{Associative over scalars}: $\lambda(\mu\vect{x})=(\lambda\mu)\vect{x}$
+			\item \textit{Identity element}: $\exists 1\in\mathbb{R}:1\vect{x}=\vect{x}$
+		\end{itemize}
+\end{itemize}
+\end{definition}
+\begin{definition}[Subspace]
+A subspace is any non-empty subset of $\mathcal{X}$ being itself a vector space.
+\end{definition}
+\begin{definition}[Linear Combination]
+Given $n$ scalars $\lambda_i\in\mathbb{R}$ and $n$ vectors $\vect{x}_i\in\mathcal{X}$, their linear combination is: 
+\begin{center}
+	$\displaystyle \Sum_{i=1}^n\lambda_i\vect{x}_i$
+\end{center}
+\end{definition}
+\newpage
+\begin{definition}[Span]
+The span of vectors $\vect{x}_1, ..., \vect{x}_n$ is defined as the set of their linear combinations:
+\begin{center}
+	$\displaystyle \left\{\Sum_{i=1}^n\lambda_i\vect{x}_i,\lambda_i\in\mathbb{R} \right\}$
+\end{center}
+\end{definition}
+\begin{definition}[Linear independency]
+A set of vectors $\vect{x}_i$ is linearly independent if none of them can be written as a linear combination of the others.
+\end{definition}
+\begin{definition}[Basis]
+A set of vectors $\vect{x}_i$ is a basis for $\mathcal{X}$ if any element in $\mathcal{X}$ can be uniquely written as a linear combination of vectors $\vect{x}_i$.
+\end{definition}
+A necessary condition for this to be true is that vectors $\vect{x}_i$ are linearly independent. All bases of $\mathcal{X}$ have the same number of elements, called the \textit{dimension} of the vector space.\newline
+\begin{definition}[Linear Map]
+Given two vector spaces $\mathcal{X}, \mathcal{Z}$, a function $f:\mathcal{X}\rightarrow\mathcal{Z}$ is a linear map if all $\vect{x},\vect{y}\in\mathcal{X},\lambda\in\mathbb{R}$:
+\begin{itemize}
+	\item $f(\vect{x}+\vect{y})=f(\vect{x})+f(\vect{y})$
+	\item $f(\lambda\vect{x})=\lambda f(\vect{x})$
+\end{itemize}
+\end{definition}
+A linear map between two finite-dimensional spaces $\mathcal{X}, \mathcal{Z}$, $\mathcal{X}\xrightarrow[f]{}\mathcal{Z}$ of dimensions $n,m$ can always be written as a matrix of basis transformation:
+\[M\in\mathbb{R}^{m\times n}=
+\begin{bmatrix}
+	a_{11} & \hdots & a_{1n}\\
+	\vdots & \vdots & \vdots\\
+	a_{m1} & \hdots & a_{mn}
+\end{bmatrix}
+\]
+Let $\{\vect{x}_1,...,\vect{x}_n\}$ and $\{\vect{z}_1,...,\vect{z}_m\}$ be some bases for $\mathcal{X}$ and $\mathcal{Z}$ respectively. For any $\vect{x}\in\mathcal{X}$ we have that it can be written as the linear combination of vectors in the basis, hence:
+\begin{center}
+	$\displaystyle f(\vect{x})=f\left(\Sum_{i=1}^n\lambda_i\vect{x}_i\right)=\Sum_{i=1}^n\lambda_if(\vect{x}_i)$\\
+\end{center}
+Since there is a function $f$ that maps values from $\mathcal{X}$ to $\mathcal{Z}$, then:
+\begin{center}
+	$\displaystyle f(\vect{x}_i )=\Sum_{j=1}^ma_{ji}\vect{z}_i$
+\end{center}
+Which leads to:
+\begin{center}
+	$\displaystyle f(\vect{x})=\Sum_{i=1}^n\Sum_{j=1}^m\lambda_ia_{ji}\vect{z}_j=\Sum_{j=1}^m\left(\Sum_{i=1}^n\lambda_ia_{ji}\right)\vect{z}_j=\Sum_{j=1}^m\mu_j\vect{z}_j$
+\end{center}
+In short:
+\begin{center}
+	$\displaystyle M\lambda=\mu$
+\end{center}
+\begin{definition}[Matrix Properties – Transpose]
+Given a matrix $M$, the transposed matrix $M^T$ is the matrix obtained by exchanging rows and columns. Tra transposed of the product of two matrixes $M, N$, is the product of the two transposed:
+\begin{center}
+	$\displaystyle (MN)^T=N^TM^T$
+\end{center}
+\end{definition}
+\begin{definition}[Matrix Properties – Trace]
+The trace of a matrix $M$ is the sum of the diagonal elements of the matrix:
+\begin{center}
+	$\displaystyle tr(M)=\Sum_{i=1}^nM_{ij}$
+\end{center}
+\end{definition}
+\begin{definition}[Matrix Properties – Inverse]
+The inverse matrix is a matrix that multiplies with the original matrix gives the identity:
+\begin{center}
+	$\displaystyle MM^{-1}=I$
+\end{center}
+\end{definition}
+\begin{definition}{Matrix Properties – Rank}
+The rank of a $n\times m$ matrix is the dimension of the space spanned by its columns. 
+\end{definition}
+The following properties for matrix derivation hold:
+\begin{center}
+	$\displaystyle \frac{\partial M\vect{x}}{\partial\vect{x}}=M$\\
+	\vspace{0.2cm}
+	$\displaystyle \frac{\partial \vect{y}^TM\vect{x}}{\partial\vect{x}}=M^T\vect{y}$\\
+	\vspace{0.2cm}
+	$\displaystyle \frac{\partial \vect{x}^TM\vect{x}}{\partial\vect{x}}=\left(M^T+M\right)\vect{x}$\\
+	\vspace{0.2cm}
+		$\displaystyle \frac{\partial \vect{x}^TM\vect{x}}{\partial\vect{x}}=2M\vect{x}\quad$ if $M$ is symmetric \\
+	\vspace{0.2cm}
+	$\displaystyle \frac{\partial \vect{x}^T\vect{x}}{\partial\vect{x}}=2\vect{x}$\\
+\end{center}
+\begin{definition}[Norm]
+A function $\norm{\cdot}:\mathcal{X}\rightarrow\mathbb{R}^+_0$ is a norm if for all $\vect{x}, \vect{y}\in\mathcal{X}, \lambda\in\mathbb{R}$:
+\begin{itemize}
+	\item $\norm{\vect{x}+\vect{y}}\leq\norm{\vect{x}}+\norm{\vect{y}}$
+	\item $\norm{\lambda\vect{x}}=\abs{\lambda}\norm{\vect{x}}$
+	\item $\norm{\vect{x}}>0~\text{if}~\vect{x}\neq0$
+\end{itemize}
+\end{definition}
+A norm defines a metric $d:\mathcal{X}\times\mathcal{X}\rightarrow\mathbb{R}^+_0$:
+\begin{center}
+	$\displaystyle d(\vect{x},\vect{y})=\norm{\vect{x}-\vect{y}}$
+\end{center}
+\begin{definition}[Bilinear Form]
+A function $Q:\mathcal{X}\times\mathcal{X}\rightarrow\mathbb{R}$ is a bilinear form if for all $\vect{†},\vect{y}.\vect{z}\in\mathcal{X},\lambda,\mu\in\mathbb{R}$:
+\begin{itemize}
+	\item $Q(\lambda\vect{x}+\mu\vect{y},\vect{z})=\lambda Q(\vect{x}, \vect{z})+\mu Q(\vect{y},\vect{z})$
+	\item $Q(\vect{x},\lambda\vect{y}+\mu\vect{z})=\lambda Q(\vect{x}, \vect{y})+\mu Q(\vect{x},\vect{z})$
+\end{itemize}
+\end{definition}
+\begin{definition}[Bilinear Form – Symmetry]
+A bilinear form is said to be \textit{symmetric} if $\forall\vect{x},\vect{y}\in\mathcal{X}$:
+\begin{center}
+	$\displaystyle Q(\vect{x},\vect{y})=Q(\vect{y}, \vect{x})$
+\end{center}	
+\end{definition}
+\begin{definition}[Dot Product]
+A dot product $<\cdot,\cdot>:\mathcal{X}\times\mathcal{X}\rightarrow\mathbb{R}$ is a symmetric bilinear form which is positive semi-definite:
+\begin{center}
+	$\displaystyle \dprod{x}{x}\geq 0\forall\vect{x}\in\mathcal{X}$
+\end{center}
+\end{definition}
+A positive definite dot product defines a corresponding norm via:
+\begin{center}
+	$\displaystyle \norm{\vect{x}}=\sqrt{\dprod{x}{x}}$
+\end{center}
+One main property of the dot product is:
+\begin{center}
+	$\displaystyle \cos\theta=\frac{\dprod{x}{z}}{\norm{\vect{x}}\norm{\vect{z}}}$
+\end{center}
+From which follow that if two vectors are \textbf{orthogonal}, that is $\theta=\frac{\pi}{2}+k\pi, k\in\mathbb{N}$, then, $\dprod{x}{z}=0$. \newline
+Moreover a set of vectors $\{\vect{x}_1, \hdots, \vect{x}_n\}$ is said to be \textbf{orthonormal} if, for all vectors $\vect{x}_i, \vect{x}_j$ in the set:
+\[ \dprodd{\vect{x}_i,\vect{x}_j}=
+\begin{cases}
+	1\quad \text{if } i=j,\\
+	0\quad \text{otherwise}.
+\end{cases}
+\]
+\begin{definition}[Eigenvalue and Eigenvector]
+Given an $n\times n$ matrix $M$, the real value $\lambda$ and (non-zero) vector $\vect{x}$ are an eigenvalue and corresponding eigenvector of $M$ if:
+\begin{center}
+	$\displaystyle M\vect{x}=\lambda\vect{x}$
+\end{center}
+\end{definition}
+\begin{definition}[Singular Matrix]
+A matrix is singular if it has a zero eigenvalue:
+\begin{center}
+	$\displaystyle m\vect{x}=0\vect{x}=0$
+\end{center}
+\end{definition}
+A singular matrix has linearly dependent columns:
+\[
+\begin{bmatrix}
+	M_1&\hdots &M_{n-1}&M_n
+\end{bmatrix}
+\begin{bmatrix}
+	x_1\\
+	\vdots\\
+	x_{n_1}\\
+	x_n
+\end{bmatrix} = 0
+\]
+\[ M_1x_1+\hdots+M_{n-1}x_{n-1}+M_nx_n=0 \]
+\[ M_n=M_1\frac{-x_1}{x_n}+\hdots+M_{n-1}\frac{-x_{n-1}}{x_n} \]
+The determinant $\abs{M}$ of a $n\times n$ matrix $M$ is the product of its eigenvalues. \newline
+Since a matrix is invertible if its determinant is not zero, then it must not be singular. \newline
+We said that the eigenvalue and eigenvector of a matrix are a value and a vector such that:
+\begin{center}
+	$\displaystyle A\vect{x}=\lambda\vect{x}$
+\end{center}
+Trying to solve for $\lambda$ we obtain:
+\begin{center}
+	$\displaystyle \frac{\vect{x}^TA\vect{x}}{\vect{x}^T\vect{x}}=\lambda\frac{\vect{x}^T\vect{x}}{\vect{x}^T\vect{x}}$
+\end{center}
+\begin{definition}[Raleigh quotient]
+\begin{center}
+	$\displaystyle \lambda=\frac{\vect{x}^TA\vect{x}}{\vect{x}^T\vect{x}}$
+\end{center}
+\end{definition}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

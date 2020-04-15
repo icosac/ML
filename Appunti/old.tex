@@ -1,0 +1,83 @@
+\chapter{Ripasso}
+\section{Probabilità}
+Le slide sono fatte bene.\newline
+Nella slide sulla beta distribuzione $\Gamma$ è il fattoriale.\newline
+Nella slide sulla distribuzione multivariata, è $e^{-\frac{1}{2}...(x-\mu)}$.\newline
+In slide exceptation of an average i.i.d significa Independent and identically distributed random variables. \newline
+\chapter{Bayesian decision theory}
+È un framework per probabilistic reasoning che permette di fare la scelta migliore basandosi sulle probabilità. \newline
+Il primo set di insegnamento viene detto binart classification. Sono presenti delle coppie (x,y), dove x è un binary label, quindi ad esempio -1,1 e y è l'insieme delle cose che si vogliono misurare. L'obbiettivo è quello di prevedere la classe y in base a un input x. (forse è il contrario)\newline
+Anche se si hanno tutti i dati non è detto che il risultato sia certo ma si scende comunque nella probabilità. Supponiamo di avere $P(x,y)$. Abbiamo visogno di calcolare $P(y\vert x)$. Per fare questo possiamo usare Bayes:
+\begin{center}
+	$\displaystyle P(y\vert x)=\frac{p(x\vert y)P(y)}{p(x)}=\frac{P(x,y)}{\Sum_yP(x,y)}$
+\end{center}
+Si chiamano:
+\begin{itemize}
+	\item Posterior: perchè è la probabilità di y dopo aver visto x
+	\item Priori: è la probabilità di y prima di vedere x
+	\item Likelihood: è la probabilità di osservare x dato che la classe precedente è y
+	\item Evidence: 
+\end{itemize}
+In slide Bayes decision rule, $\text{argmax}_y$ indica il valore di $y$ che massimizza la funzione $f(y)$.
+
+Slide 11:
+\begin{center}
+	$\displaystyle g_i(x)=\ln(P(x\vert y_i))+log(P(y_i))=$\\
+	$\ln(\frac{1}{(2\pi)^\frac{?}{3}\vert\Sigma\vert^\frac{1}{2}}e^{-\frac{1}{2}(x-\mu)^T\Sigma^{-1}}$
+\end{center}
+Vogliamo sapere se questa funzione è lineare rispetto a $x$ (input) o che tipo di funzione essa sia. Questo cambia in base alla complessità della metrica della covarianza (?). Sia $\mu_i$ la media della classe $i$ e $\Sigma_1$ la covarianza della classe $i$. \newline
+Consideriamo il caso più semplice in cui $\Sigma_i$ sia una matrice data da una costante $\sigma^2$ per la matrice identità. Questo significa che il determinante è il prodotto della diagonale (lunga $d$) quindi si ha:
+\begin{center}
+	$\displaystyle \ln(\frac{1}{(2\pi)^{\frac{d}{2}}\sigma^{\frac{?d}{2}}}-\frac{1}{2}\frac{(x-\mu_i)^T(x-\mu_?)}{\sigma^2}+\ln(P(y_i))$
+\end{center} 
+Il termine: 
+\begin{center}
+	$\displaystyle \ln(\frac{1}{(2\pi)^{\frac{d}{2}}\sigma^{\frac{?d}{2}}}$
+\end{center}
+non dipende dalla classe quindi possiamo eliminarlo.\newline
+Il termine 
+\begin{center}
+	$\displaystyle \frac{1}{2}\frac{(x-\mu_i)^T(x-\mu_i)}{\sigma^2}$
+\end{center}
+Può essere srotolato:
+\begin{center}
+	$\displaystyle -\frac{1}{2}\frac{x^Tx}{\sigma^2}+\frac{\mu^T_ix}{2\sigma^2}-\frac{\mu^T_i\mu_i}{2\sigma^2}$
+\end{center}
+Il primo termine non dipende dalla classe quindi può essere tolto e rimane:
+\begin{center}
+	$\displaystyle g_i(x)=\frac{\mu_i^Tx}{2\sigma^2}-\frac{\mu_i^T\mu_i}{2\sigma^2}+\ln(P(y_i))$
+\end{center}
+Supponiamo di avere una seconda funzione discriminante:
+\begin{center}
+	$\displaystyle g_j(x)=\frac{\mu_j^Tx}{2\sigma^2}-\frac{\mu_j^T\mu_j}{2\sigma^2}+\ln(P(y_j))$
+\end{center}
+Qual è il confine (boundary) fra le due classi? è quando le due classi hanno lo stesso valore ossia:
+\begin{center}
+	$\displaystyle g_i(x)=g_j(x)$\\
+	$\displaystyle \frac{\mu_i^Tx}{2\sigma^2}-\frac{\mu_i^T\mu_i}{2\sigma^2}+\ln(P(y_i))-\frac{\mu_j^Tx}{2\sigma^2}+\frac{\mu_j^T\mu_j}{2\sigma^2}-\ln(P(y_j))=0$
+\end{center}
+Raccogliamo $x$:
+\begin{center}
+	$\displaystyle \frac{(\mu_i-\mu_j)^T}{2\sigma^2}x-\frac{\mu_i^T\mu_i}{2\sigma^2}+\frac{\mu_j^T\mu_j}{2\sigma^2}+\ln(\frac{P(y_i)}{P(y_j)})$
+\end{center}
+Questa funzione è lineare. \newline
+Una funzione lineare può anche essere scritta come:
+\begin{center}
+	$\displaystyle W^T(X+X_0)=W^TX+W_0$
+\end{center}
+Per tanto si può riscrivere la cosa di prima come in slide 14. Da un punto di vista grafico $W$ e $W^T$ sono due rette perpendicolari. Se si chiama $W=\mu_i-\mu_j$, allora $W^T$ è la retta perpendicolare al segmento $\mu_i, \mu_j$. Si noti che questo indica quindi il confine tra $\mu_i$ e $\mu_j$, infatti se $P(y_i)=P(y_j)$ allora il logaritmo è a 0 e rimane la media. Se Invece $P(y_i)>P(y_j)$ allora o viceversa, si sposta verso uno dei due e siamo apposto.\newline
+Questo è quello che succede quando tutte le classi sono gaussiane. \newline
+Se $\Sigma_i$ è una covarianza ma non dipende dalle classi $\Sigma_i=\Sigma$, allora il termine quadro di $x$ non esiste più e quindi è ancora lineare. In questo caso però non sarà più ortogonale al segmento che unisce i centri delle due classi.\newline
+Se $\Sigma_i=arbitrary$, allora non esiste un vero e proprio separatore e si possono avere tutte le forme che si vogliono, anche non lineari.\newline
+\section{Evaluation}
+L'acurattezza presenta dei problemi: se il dataset è molto sbilanciato, allora non ci si può affidare all'acuratezza in quanto ritornerà sempre lo stesso valore. \newline
+Precision and recall do not suffer of this problem. Ci sono però dei casi in cui si preferisce massimizzare uno dei due: ad esempio se si fosse un dottore si preferirebbe avere dei falsi allarme piuttosto di falsi negativi. \newline
+Ci sono altri metodi che sono detti aggregati. $F$ è un metodo parametrico, e il caso più comune è $F_1$ d è definito come in slide 7. L'idea che questo valore è alto se si ha un buon compromesso tra precision e recall. \newline
+Siccome precisione e recall sono complementari, si può tracciare una curva che non è molto curva ma più spezzata. Più grande è l'area sottesa dalla curva migliore è l'algoritmo con cui si lavora. \newline
+Questo può essere facilmente generalizzato a più classi. In questo caso i true-positives per una classe sono calcolati come la diagonale. Mentre false positive e false negative sono calcolati come mostrato in slide 11. \newline
+\subsection{Performance evaluation}
+\subsubsection{inner cross validation}
+preso tutto quanto lo dividi in k cosi, quindi prendi k-1 cosi, e ridividi in n e poi non so. è usato per la selezione del modello da usare.
+\subsubsection{outer cross validation} 
+Viene usato per la stima finale. 
+\chapter{Parameter estimation}
