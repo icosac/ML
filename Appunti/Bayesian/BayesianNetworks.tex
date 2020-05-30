@@ -243,11 +243,29 @@ p(a,b\vert c)=\cfrac{p(c\vert a,b)p(a)p(b)}{p(c)}\neq p(a\vert c)p(b\vert c)
 \begin{center}
   \includegraphics[width=0.4\linewidth]{HeadToHeadGiven}
 \end{center}
+Let's consider one last time the example of the student that is to be hired from a company. We have said that if $c$ is not given, then $a$ and $b$ are independent, while if $c$ is given they are dependent. Indeed, if $c$ was the score of a test, then the student ($G$) and it was low, we could think that they are actually not that smart, but then if we were to observe that the test was difficult, then we could think that actually they are not \textit{not} intelligent. Hence, $a$ and $b$ are actually correlated if $c$ is given. 
 \begin{center}
   \includegraphics[width=0.8\linewidth]{DSeparationRecap}
 \end{center}
 \myparagraph{Example Head-To-Head Example}
-Let's consider a fuel system of a car.
+Let's consider a fuel system of a car. The fuel system is make of:
+\begin{itemize}
+  \item Battery $B$: can either be charged ($B=1$) or flat ($B=0$);
+  \item Fuel tank $F$: can either be full ($F=1$) or empy ($F=0$);
+  \item Electric fuel gauge $G$: either full ($G=1$) or empty ($G=0$).
+\end{itemize}
+Let's now say that the probability of the battery to be charged is $P(B=1)=0.9$ and the probability for the fuel tank to be full is $P(F=1)=0.9$. \newline
+Since he electric fuel gauge is conditioned on both:
+\begin{center}
+  \includegraphics[width=0.8\linewidth]{FuelTankExample1}
+\end{center}
+we can derive:
+\[
+  \begin{array}{ll}
+    P(G=1\vert B=1,F=1)=0.8&P(G=1\vert B=1,F=0)=0.2\\
+    P(G=1\vert B=0,F=1)=0.2&P(G=1\vert B=0,F=0)=0.1\\
+  \end{array}
+\]
 
 
 \data{17/10/2019}
