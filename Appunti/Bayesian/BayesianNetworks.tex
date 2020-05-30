@@ -139,7 +139,7 @@ Graphical models allow to directly verify them through the \textbf{d-separation}
 %
 %
 \section{D-separation}
-Looking at some simpler graphs, some dependency rules can be inferred and then used on larger graphs by applying them to subgraphs.\newline
+Looking at some simpler graphs, some dependency rules can be inferred and then used on larger graphs by applying them to subgraphs.
 %
 %
 \subsection{Two Nodes}
@@ -151,14 +151,14 @@ Given two nodes, or they are independent, hence they are not connected, or they 
 \subsubsection{Tail-To-Tail}
 Also known as \textit{common cause}.
 \begin{center}
-	\includegraphics[scale=0.2]{tailToTailNoGiven}
+	\includegraphics[width=0.4\linewidth]{tailToTailNoGiven}
 \end{center}
 As for the factorization Equation~\ref{eq:BayesianNetworkFactorization}, the joint distribution can be expressed as:
 \[
-	p(a,b,c)=p(a\vert c)è(b\vert c)p(c)
+	p(a,b,c)=p(a\vert c)p(b\vert c)p(c)
 \]
-The tail-to-tail case says that $a$ and $b$ are \textit{not independent}, written %TODO non so come scrivere quel simbolo $a\downmodels b\vert\emptyset$ 
-if $c$ is not given:
+The tail-to-tail case says that $a$ and $b$ are \textit{not independent}, written $a \not\!\perp\!\!\!\perp b$. %$a\downmodels b\vert\emptyset$
+If $c$ is not given then we have that:
 \[
 	p(a,b)=\Sum_cp(a\vert c)p(b\vert c)p(c)\neq p(a)p(b)
 \] 
@@ -167,29 +167,29 @@ On the contrary, if $c$ is given, then they are \textit{conditionally independen
 p(a,b\vert c)=\cfrac{p(a,b,c)}{p(c)}=p(a\vert c)p(b\vert c)
 \] 
 \begin{center}
-	\includegraphics[scale=0.2]{tailToTailGiven}
+	\includegraphics[width=0.4\linewidth]{tailToTailGiven}
 \end{center}
-Let's consider an example: a company needs to choose the most intelligent ($I$) student between more students. For each student the variables grade $(G)$ and score $S$ are given. The following graph can be drawn since if the student is intelligent, then it should be seen in both grades and scores. \newline
+Let's consider an example: a company needs to choose the most intelligent ($I$) student between more students. For each student the variables grade $(G)$ and score ($S$) are given. The following graph can be drawn since if the student is intelligent, then it should be seen in both grades and scores. \newline
 \begin{minipage}[htp]{\linewidth}
 	\begin{minipage}[t]{0.48\linewidth}
 		\begin{center}
-			\includegraphics[width=\linewidth]{tailToTailExample1}
+			\includegraphics[width=0.7\linewidth]{tailToTailExample1}
 		\end{center}
-		$G$ and $S$ are directly correlated, for example observing high scores could be indication of having a high score. 
+		$G$ and $S$ are directly correlated, for example observing high scores could be indication of having a higher intelligence and hence also higher grades. 
 	\end{minipage}
 	\hspace{0.04\linewidth}
 	\begin{minipage}[t]{0.48\linewidth}
 		\begin{center}
-			\includegraphics[width=\linewidth]{tailToTailExample2}
+			\includegraphics[width=0.7\linewidth]{tailToTailExample2}
 		\end{center}
-		$G$ and $S$ are not directly dependent since once intelligence has been observed, the correlation disappear and $G$ gives no information more than the one we already know. 
+		$G$ and $S$ are not directly dependent since once intelligence has been observed, the correlation disappear and nor $G$ gives more information $S$, nor $S$ gives more information about $G$ than the what we already know. 
 	\end{minipage}
 \end{minipage}
 %
 \subsubsection{Head-To-Tail}
 Also known as \textit{indirect causal effect}.
 \begin{center}
-	\includegraphics[scale=0.2]{HeadToTailNoGiven}
+	\includegraphics[width=0.4\linewidth]{HeadToTailNoGiven}
 \end{center}
 The joint distribution can be expressed as:
 \[
@@ -199,44 +199,58 @@ If $c$ is not given, then then $a$ and $b$ are \textit{not independent}:
 \[
 p(a,b)=p(a)\Sum_cp(b\vert c)p(c\vert a)\neq p(a)p(b)
 \]
-If instead $c$ is given, then $a$ and $b$ are conditionally dependent:
+If instead $c$ is given, then $a$ and $b$ are conditionally independent:
 \[
 p(a,b\vert c)=\cfrac{p(b\vert c)p(a\vert c)p(c)}{p(c)}=p(b\vert c)p(a\vert c)
 \]
-
+\begin{center}
+  \includegraphics[width=0.4\linewidth]{HeadToTailGiven}
+\end{center}
+As before, let's consider the example of the intelligence of a student. \newline
+\begin{minipage}[htp]{\linewidth}
+	\begin{minipage}[t]{0.48\linewidth}
+		\begin{center}
+			\includegraphics[width=0.7\linewidth]{HeadToTailExample1}
+		\end{center}
+    Intuitivly, if we observe that the student is intelligent, then we are more inclined to believe that it's grades $G$ are good and that they will have a better score at the interview $S$, that is the probability of these latter events is higher conditioned on the observation that the student is intelligent. 	
+	\end{minipage}
+	\hspace{0.04\linewidth}
+	\begin{minipage}[t]{0.48\linewidth}
+		\begin{center}
+			\includegraphics[width=0.7\linewidth]{HeadToTailExample2}
+		\end{center}
+    Instead if we assume that $G$ is observed, then it's intelligence no longer influences the score of the interview.
+	\end{minipage}
+\end{minipage}
+%
 \subsubsection{Head-To-Head}
 Also known as \textit{common effect}.
 \begin{center}
-	\includegraphics[scale=0.2]{HeadToTailNoGiven}
+	\includegraphics[width=0.4\linewidth]{HeadToHeadNoGiven}  
 \end{center}
 The joint distribution can be expressed as:
 \[
-p(a,b,c)=p(b\vert c)p(c\vert a)p(a)=p(b\vert c)p(a\vert c)p(c)
+  p(a,b,c)=p(c\vert a, b)p(a)p(b)
 \]
-If $c$ is not given, then then $a$ and $b$ are \textit{not independent}:
+If $c$ is not given, then then $a$ and $b$ are \textit{independent}:
 \[
-p(a,b)=p(a)\Sum_cp(b\vert c)p(c\vert a)\neq p(a)p(b)
+  p(a,b)=\Sum_cp(c\vert a, b)p(a)p(b)=p(a)p(b)
 \]
-If instead $c$ is given, then $a$ and $b$ are conditionally dependent:
+If instead $c$ is given, then $a$ and $b$ are not conditionally independent, hence they are conditionally dependent:
 \[
-p(a,b\vert c)=\cfrac{p(b\vert c)p(a\vert c)p(c)}{p(c)}=p(b\vert c)p(a\vert c)
+p(a,b\vert c)=\cfrac{p(c\vert a,b)p(a)p(b)}{p(c)}\neq p(a\vert c)p(b\vert c)
 \]
+\begin{center}
+  \includegraphics[width=0.4\linewidth]{HeadToHeadGiven}
+\end{center}
+\begin{center}
+  \includegraphics[width=0.8\linewidth]{DSeparationRecap}
+\end{center}
+\myparagraph{Example Head-To-Head Example}
+Let's consider a fuel system of a car.
 
 
-
- Si noti che se i 3 nodi sono in realtà tutti collegati, ossia $A\rightarrow B, B\rightarrow C, C\rightarrow A$, allora questo è semplice in quanto non c'è indipendenza, è tutto dipendente, inoltre non si dovrebbero avere cicli. Per tanto dati 3 nodi e al più 2 lati, allora possiamo distinguere dei casi:
-\begin{itemize}
-	\item $C\rightarrow A, C\rightarrow B$: questo viene chiamato tail-to-tail e si ha per fattorizzazione la distribuzione: $P(A, B, C)=P(A\vert C)P(B\vert C)P(C)$. Dove 
-		\begin{center}
-			$\displaystyle P(A, B)=\Sum_CP(A,B,C)=\Sum_CP(A\vert C)P(B\vert C)P(C)$
-		\end{center} 
-		Possiamo notare ora che non c'è modo per dire che $\Sum_CP(A\vert C)P(B\vert C)P(C)=P(A)P(B)$ perchè A e B non sono direttamente indipendenti??????????????????????????
-	\item $a\rightarrow b\rightarrow c$ head-to-tail, la distribuzione congiunta è: $p(a,b,c)=p(b\vert c)p(c\vert a)p(a)=p(b\vert c)p(a\vert c)p(c)$
-	\item vedi slide.
-\end{itemize}
-
-
-\chapter{17/10/2019}
+\data{17/10/2019}
 $P(F=0\vert G=0)$ non è direttamente presente nelle tabelle e quindi bisogna riuscire a ricrearla.\newline
 Per esempio abbiamo una probabilità: $P(G=0\vert F=0)$ e quindi possiamo usare Bayes per girarla:
 \begin{center}

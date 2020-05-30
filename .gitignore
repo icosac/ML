@@ -19,6 +19,7 @@
 *.fdb_latexmk
 *.fls
 *.latexmain
+*.synctex(busy)
 
 SLIDE/
 slide/
@@ -28,3 +29,5 @@ Slide/
 
 .idea/
 venv_new/
+
+
