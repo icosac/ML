@@ -255,44 +255,67 @@ Let's consider a fuel system of a car. The fuel system is make of:
   \item Electric fuel gauge $G$: either full ($G=1$) or empty ($G=0$).
 \end{itemize}
 Let's now say that the probability of the battery to be charged is $P(B=1)=0.9$ and the probability for the fuel tank to be full is $P(F=1)=0.9$. \newline
-Since he electric fuel gauge is conditioned on both:
+The electric fuel gauge is conditioned on both:
 \begin{center}
-  \includegraphics[width=0.8\linewidth]{FuelTankExample1}
+  \includegraphics[width=0.5\linewidth]{FuelTankExample1NoGiven}
 \end{center}
-we can derive:
 \[
   \begin{array}{ll}
     P(G=1\vert B=1,F=1)=0.8&P(G=1\vert B=1,F=0)=0.2\\
     P(G=1\vert B=0,F=1)=0.2&P(G=1\vert B=0,F=0)=0.1\\
   \end{array}
 \]
+We want to compute the probability of having an empty tank:
+\[P(F=0)=1-P(F=1)=0.1\]
+What would happen to the probability if we were to notice that the fuel gauge was empty? In particular let's compute the probability of the fuel tank to be empty given the fact that the fuel gauge is empty $P(F=0\vert G=0)$. Such probability is not given, hence we need to find it. To compute $P(F=0\vert G=0)$ we could use Bayes:
+\[P(F=0\vert G=0)=\dfrac{P(G=0\vert F=0)P(F=0)}{P(G=0)}\]
+We need to compute $P(G=0\vert F=0)$ and $P(G=0)$ but they are easier to compute by the product rule:
+\[
+\begin{array}{ll}
+  P(G=0\vert F=0)&=\Sum_{B\in\{0,1\}}P(G=0,B\vert F=0)\\
+                 &=\Sum_{B\in\{0,1\}}P(G=0\vert B,F=0)P(B\vert F=0)\\
+                 &=\Sum_{B\in\{0,1\}}P(G=0\vert B,F=0)P(B)\\
+                 &=P(G=0\vert B=0, F=0)P(B=0)+P(G=0\vert B=1, F=0)P(B=1)\\
+                 &=0.9\cdot0.1+0.8\cdot 0.9=0.81
+\end{array}
+\]
+Notice that the passage from the second to the third equation it's possible since $B$ and $F$ are independent, hence $P(B\vert F=0)=P(B)$.\newline 
+Similarly $P(G=0)$ is given by:
+\[
+\begin{array}{ll}
+  P(G=0)&=\Sum_{B\in\{0,1\}}\Sum_{F\in\{0,1\}}P(G=0,B,F)\\
+        &=\Sum_{B\in\{0,1\}}\Sum_{F\in\{0,1\}}P(G=0\vert B,F)P(B)P(F)=0.315  
+\end{array}
+\]
+In the end it's possible to see that by observing the fact that the fuel gauge is empty, then the probability of the fuel tank of being actually empty increases:
+\[P(F=0\vert G=0)=\dfrac{P(G=0\vert F=0)P(F=0)}{P(G=0)}\simeq 0.257\]
+Not as much as one would expect, but this is due to strong prior and an unreliable gauge. \newline
+Now let's consider the case in which we knew that also the battery is flat. How does the probability $P(F=0\vert G=0,B=0)$ change knowing this information? \newline
+It's possible to apply again Bayes Theorem and have:
+\[P(F=0\vert G=0, B=0)=\dfrac{P(G=0\vert F=0,B=0)P(F=0\vert B=0)}{P(G=0\vert B=0)}\]
+\begin{definition}[Active Trail]
+  Let's consider a graph with three node $X,Y,Z$ connected as in one of the cases before. The trail $X\rightleftharpoons Y\rightleftharpoons Z$ is said to be \textit{active} if information can flow from $X$ to $Y$ via $Z$.
+  \begin{itemize}
+    \item Head-to-Tail $X\rightarrow Z\rightarrow Y$ is active if and only if $Z$ \textbf{is not} observed;
+    \item Tail-to-Tail $X\leftarrow Z\rightarrow Y$ is active if and only if $Z$ \textbf{is not} observed;
+    \item Head-to-Head $X\rightarrow Z\leftarrow Y$ is active if and only if $Z$ \textbf{is} observed;
+  \end{itemize}
+\end{definition}
+%
+%
+\subsection{General Case}
+\begin{definition}[$d$-Separation General Case]
+  Let $\mathcal{G}$ be a BN structure and $X_1\rightleftharpoons\hdots\rightleftharpoons X_n$ a trail in $\mathcal{G}$. Let $vect{Z}$ be a subset of observed variables. The trail $X_1\rightleftharpoons\hdots\rightleftharpoons X_n$ is active given $\vect{Z}$ if:
+  \begin{itemize}
+    \item Whenever we have a head-to-head structure $X_{i-1}\rightarrow X_i\leftarrow X_{i+1}$, then $X_i$ or one of its descendants are in $\vect{Z}$;
+    \item No other node along the trail is in $\vect{Z}$.
+  \end{itemize}
+\end{definition}
+Note that if $X_1$ or $X_n$ are in $\vect{Z}$, then the trail is not active. 
+%
+\subsubsection{Example}
 
 
-\data{17/10/2019}
-$P(F=0\vert G=0)$ non è direttamente presente nelle tabelle e quindi bisogna riuscire a ricrearla.\newline
-Per esempio abbiamo una probabilità: $P(G=0\vert F=0)$ e quindi possiamo usare Bayes per girarla:
-\begin{center}
-	$\displaystyle P(F=0\vert G=0)=\frac{P(G=0\vert F=0)P(F=0)}{P(G=0)}$
-\end{center}
-Di questo conosimamo solo P(F=0), tutto il resto ce lo calcoliamo:
-\begin{center}
-	$\displaystyle P(G=0\vert F=0)= \Sum_{B \in \{0,1\}} P(G=0, \vert F=0) =
-					\Sum_{B \in\{0,1\}}P(G=0\vert B,F=0)P(B\vert F=0)$
-\end{center}
-La prima probabilità la abbiamo, la seconda non l'abbiamo, però nella struttura dell'esempio B e $F$ sono indipendenti e quindi $P(B\vert F=0)=P(B)$. quindi otteniamo:
-\begin{center}
-	$\displaystyle =P(G=0\vert B=0, F=0)P(B=0)+P(G=0\vert B=1, F=0)P(B=1)$
-\end{center}
-Ora queste probabilità le conosciamo quindi:
-\begin{center}
-	$\displaystyle =0.9+0.1+(1-0.2)+0.9$
-\end{center}
-Attenzione che se osserviamo solo B e F i due sono indipendenti, se invece consideriamo tutta la rete, allora abbiamo G e B e F sono dipendenti. Mind that also saying given doesn't mean we know the value for sure, it just means we assume it gets that value. \newline
-Dobbiamo ora calcolarci $P(G=0)$. 
-\begin{center}
-	$\displaystyle P(G=0)=\Sum_{F,B}P(G=0, F, B)=\Sum_{F,B}P(G=0\vert F, B)P(F)P(B)$
-\end{center}
-Di queste probabilità abbiamo tutti i dati quindi possiamo concludere.\newline
 \section{d-separation}
 Abbiamo visto le 3 diverse strutte nel caso di 3 nodi. Consider tail to tail and for example earthquake->alarm, burglar->alarm if you see the alarm you can think of the burglar, but if you see earthquake, than for sure it's not a burglar, so the two fathers are related. \newline
 If we add a fourth node phone call from alarm, then
