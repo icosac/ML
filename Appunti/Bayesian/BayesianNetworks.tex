@@ -303,81 +303,271 @@ It's possible to apply again Bayes Theorem and have:
 \end{definition}
 %
 %
-\subsection{General Case}
-\begin{definition}[$d$-Separation General Case]
-  Let $\mathcal{G}$ be a BN structure and $X_1\rightleftharpoons\hdots\rightleftharpoons X_n$ a trail in $\mathcal{G}$. Let $vect{Z}$ be a subset of observed variables. The trail $X_1\rightleftharpoons\hdots\rightleftharpoons X_n$ is active given $\vect{Z}$ if:
+\subsection{d-Separation -- General Case}
+Obviously the majority of the graphs is not made of three nodes, but has many nodes. Suppose that we want to find a path that allows to go from one group nodes holding evidence to another. We can say whether this is possible or not by applying the before rules and by adding the following rule: a head-to-head node $c$ unblocks the dependency path between its parents if either itself or \textit{any of its descendants} receives evidence. \newline
+\begin{definition}[Descendant]
+  A descendant of a node $x$ is any node which can be reached from $x$ with a path following the direction of the arrows.   
+\end{definition}
+\begin{theorem}[$d$-Separation General Case]
+  Let $\mathcal{G}$ be a Bayesian Network structure and $X_1\rightleftharpoons\hdots\rightleftharpoons X_n$ a trail in $\mathcal{G}$. Let $\vect{Z}$ be a subset of observed variables. The trail $X_1\rightleftharpoons\hdots\rightleftharpoons X_n$ is active given $\vect{Z}$ if:
   \begin{itemize}
     \item Whenever we have a head-to-head structure $X_{i-1}\rightarrow X_i\leftarrow X_{i+1}$, then $X_i$ or one of its descendants are in $\vect{Z}$;
     \item No other node along the trail is in $\vect{Z}$.
   \end{itemize}
+\end{theorem}
+Note that if $X_1$ or $X_n$ are in $\vect{Z}$, then the trail is not active. \newline
+\begin{definition}[Path Blocked]
+  A path is said to be blocked if it includes at least one node such that either:
+  \begin{itemize}
+    \item The arrows on the path meet tail-to-tail or head-to-tail at the node and it is in $C$, or
+    \item The arrows on the path meet head-to-head at the node and neither it nor any of its descendants is in $C$. 
+  \end{itemize}
 \end{definition}
-Note that if $X_1$ or $X_n$ are in $\vect{Z}$, then the trail is not active. 
+\begin{definition}[General d-separation Criterion]
+  Given a generic Bayesian Network and nonintersecting arbitrary sets of nodes $A,B,C$, the sets $A$ and $B$ are d-separated by $C$, written $\dsep{A;B\vert C}$ if all paths from any node in $A$ to any node in $B$ are blocked.
+  \label{def:dSeparation}
+\end{definition}
+Note that d-separation \textit{implies conditional independence}: the sets $A$ and $B$ are independent given $C$, written $A\perp B\vert C$ if they are d-separated by $C$.
 %
-\subsubsection{Example}
+\subsubsection{Example 1}
+Let's consider the following graph:
+\begin{center}
+  \includegraphics[width=0.7\linewidth]{dSeparationExample1_1}
+\end{center}
+and three independent sets: $A=\{X_1,X_2\}, B=\{X_5,X_7\}, C=\emptyset$. By applying the rules we need to find a possible path from one set to another. For example let's consider a first possibility made of the path $X_1\rightarrow X_4\rightarrow X_6\leftarrow x_5$: the first three nodes are in a head-to-tail structure, we do not have any information regarding $X_4$, hence the path is active till this point. $X_4\rightarrow X_6\leftarrow X_5$ is a head-to-head structure and there is no evidence on $X_6$, hence the path is blocked. \newline
+Let's instead consider the path: $X_1\rightarrow X_4\rightarrow X_6\rightarrow X_7$. We saw that the first three nodes are in a head-to-tail structure and there is no evidence, so the trail is active. Let's then look at the last three nodes: $X_4\rightarrow X_6\rightarrow X_7$: this is head-to-tail structure and there is no evidence on $X_6$, hence the trail is active and an actual path from the set $A$ to the set $B$ could be found. \newline
+It's possible to find also a path starting from $X_2$: $X_2\leftarrow X_3\rightarrow X_6 \rightarrow X_7$ which actually works because the first three nodes are in a tail-to-tail structure and there is no evidence on $X_3$, hence the trail is active, and the last three nodes are in a head-to-tail structure with no evidence on $X_6$. \newline
+Similarly to before, the path $X_2\leftarrow X_3\rightarrow X_6\rightarrow X_5$ does not work because the last three nodes are in a head-to-head structure and there is no evidence on $X_6$.
+%
+\subsubsection{Example 2}
+Let's consider the case in which $X_6$ is given evidence:
+\begin{center}
+  \includegraphics[width=0.7\linewidth]{dSeparationExample1_2}
+\end{center}
+In this case the path $X_1\rightarrow X_4\rightarrow X_6 \leftarrow X_5$ is a correct path since $X_4$ holds no evidence hence the trail $X_1\rightarrow X_4\rightarrow X_6$ is active and $X_6$ holds evidence, so the structure $X_4\rightarrow X_6\leftarrow X_5$ is active too. 
+%
+\subsubsection{Example 3}
+Let's consider the following cases and decide whether $a$ and $b$ are d-separated:
+\begin{center}
+  \begin{minipage}[t]{\linewidth}
+    \begin{minipage}[t]{0.48\linewidth}
+      \begin{center}
+        \includegraphics[width=0.8\linewidth]{dSeparationExample2_1}
+      \end{center}
+      In this case, the first three nodes meet a head-to-head structure and we have that $c$, which is a descendant of $e$, has evidence, hence the trail is active. The last three nodes are in a tail-to-tail structure, $f$ does not have any evidence, hence the path is valid and $a$ and $b$ are not d-separated since there exists a path from $a$ to $b$. 
+    \end{minipage}
+    \hspace{0.03\linewidth}
+    \begin{minipage}[t]{0.48\linewidth}
+      \begin{center}
+        \includegraphics[width=0.8\linewidth]{dSeparationExample2_2}
+      \end{center}
+      It's immediate to see that $f$ is observed, hence the trail $e\leftarrow f\rightarrow b$ is not active, and also there is no evidence for $e$ or any of its descendants. By Definition~\ref{def:dSeparation}, $a$ and $b$ are d-separated given $f$: $a\perp b\vert f$.
+    \end{minipage}
+  \end{minipage}
+\end{center}
+%
+%
+%
+\section{Bayesian Networks independences}
+We saw how local independences work, that is independences between nodes, now we are going to define also global dependencies. \newline
+\begin{definition}[Local Independece]
+  A Bayesian Networks structure $\mathcal{G}$ encodes a set of local independence assumptions:
+  \[\mathcal{I}_l(\mathcal{G})=\{\forall i~ x_i\perp \text{nondescendants}_{x_i}\vert \text{parents}_{x_i}\}\]
+\end{definition}
+\begin{definition}[Global Independence]
+  A Bayesian Network structure $\mathcal{G}$ encodes a set of global (Markov) independence assumptions:
+  \[\mathcal{I}(\mathcal{G})=\{(A\perp B\vert C):\dsep{A;B\vert C}\}\]
+\end{definition}
+Notice that the global independences contain the local independences.
+%
+%
+%
+\section{$l$-Equivalence}
+We can notice that different structures actually encode the same set of independences assumptions. Let's consider for example head-to-head in one direction or in the other: if the intermediate node does not present evidence, then the two structures encode the same independence. In Figure~\ref{fig:lEquivalence} are shown two equivalence classes. 
+\begin{figure}[htp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{lEquivalence}
+  \caption{Two equivalence classes.}
+  \label{fig:lEquivalence}
+\end{figure}
+\begin{definition}[$l$-Equivalence]
+  Two Bayesian Networks structures $\mathcal{G}$ and $\mathcal{G}'$ are $l$ equivalent if $\mathcal{I}(\mathcal{G})=\mathcal{I}(\mathcal{G}')$.
+\end{definition}
+The space of Bayesian Network structures over the set of nodes $\mathcal{X}$ is partitioned into a set of mutually exclusive and exhaustive $l$-equivalence classes. \newline
+Note that $l$-equivalence of two graphs implies that any distribution $P$ that can be factorized over on of these graphs can be factorized over the other too. Furthermore, there is no intrinsic property $P$ that would allow us to associate it with one graph rather than an equivalent one. In other words, although we can determine, for a distribution $P(X,Y)$, whether $X$ and $Y$ are correlated, there is nothing in the distribution that can help us determine whether the correct structure is $X\rightarrow Y$ or $Y\rightarrow X$. \newline
+\begin{definition}[Skeleton]
+  The skeleton of a Bayesian network graph $\mathcal{G}$ over a set of nodes $\mathcal{X}$ is an undirected graph over $\mathcal{X}$ that contains an edge $\{X,Y\}$ for every edge $(X,Y)$ in $\mathcal{G}$.
+\end{definition}
+It's possible to prove that if two structures $\mathcal{G}$ and $\mathcal{G}'$ have the same skeleton and the same set of v-structures, then they are $l$-equivalent. 
+\begin{center}
+  \includegraphics[width=0.7\linewidth]{lEquivalenceSkeleton}
+\end{center}
+Considering the above structures, they are $l$-equivalent since they have the same skeleton and the same v-structure ($X\rightarrow Y\leftarrow Z$). \newline
+This is actually a \textit{sufficient condition}. Instead it's possible to have a \textit{necessary and sufficient condition} by considering also \textbf{immoralities}.
+\begin{definition}[Immorality]
+  A v-structure $X\rightarrow Z\leftarrow Y$ is an immorality if there is no direct edge between $X$ and $Y$. If there is such an edge, it is called a \textbf{covering edge} for the v-structure.  
+\end{definition}
+\begin{center}
+  \includegraphics[width=0.6\linewidth]{lEquivalenceImmorality}
+\end{center}
+It's possible to notice that the v-structure $F\rightarrow G\leftarrow J$ is different from the other two since there is no edge between $F$ and $J$. This implies that such v-structure is an immorality, while the others are not immoralities. \newline
+The following necessary and sufficient condition can be expressed an proven:
+\begin{theorem}
+  Let $\mathcal{G}_1$ and $\mathcal{G}_2$ be two graphs over a set of nodes $\mathcal{X}$. Then $\mathcal{G}_1$ and $\mathcal{G}_2$ have the same skeleton and the same set of immoralities if and only if they are $l$-equivalent. 
+\end{theorem}
+%
+%
+\subsection{$l$-Maps}
+There can be two types of of maps: \textit{minimal l-maps} and \textit{P-maps}, that is perfect maps. \newline
+Notice that for a structure $\mathcal{G}$ to be an $l$-map for a distribution $p$, it does not need to encode all its independences, e.g., a fully connected graph is an $l$-map of any $p$ defined over its variables.
+\begin{definition}[Minimal $l$-Map]
+  A minimal $l$-map for a distribution $p$ is an $l$-map $\mathcal{G}$ which can't be reduced into a $\mathcal{G}'\subset \mathcal{G}$ that is also an $l$-map for $p$.
+\end{definition}
+To reduce an $l$-map to another $l$-map means that by removing some edges we obtain again a valid $l$-map. \newline
+Note that by this definition, a minimal $l$-map for $p$ does not necessarily capture all the independences in $p$. On the contrary a perfect $P$-map does:
+\begin{definition}[$P$-Map]
+  A structure $\mathcal{G}$ is a perfect map $P$-map for a distribution $p$ if it captures all (and only) its independences:
+  \[\mathcal{I}(\mathcal{G})=\mathcal{I}(p)\]
+\end{definition}
+Notice that a $P$-map is also a minimal $l$-map, while the opposite is not valid. \newline
+There exists an algorithm that allows one to find a $P$-map for a distribution $p$, but it's exponential w.r.t. the \textit{in-degree} of the $P$-map, that is the maximum number of connections of the nodes. Moreover the algorithms returns an equivalence class rather than a single structure. \newline
+Moreover there are some distributions for which is not possible to find $P$-maps. In these cases, indirect graphs called Markov Networks are used.
+%
+%
+%
+\section{Making Bayesian Networks}
+The first step is to find a field-expert who can tell us the variables that we may need. For example, if we are trying to develop an algorithm to predict a disease, we need to know all the possible symptoms. \newline
+The next step is to actually define the variables that can be observed or that you can be interested in predicting, also latent variables can be useful. \newline
+By following \textit{causality} considerations, we try to add edges to the variables. This would allow us to have a more interpretable network and also a sparser one. \newline
+Lastly we start to add the probabilities for the configurations and its best to (almost) never assign zero probabilities. If any data are available, we should use them to help in learning parameters, and also the structure. 
+%
+%
+%
+\section{Inference in Graphical Models}
+Bayesian Networks, as all the graphical models, actually models a joint probability. \newline
+Assume we have evidence $\vect{e}$ on the state of a subset of variables $\vect{E}$ in the model. Inference amounts at computing the posterior probability of a subset $\vect{X}$ of the non-observed variables given the observations:
+\[P(\vect{X}\vert\vect{E}=\vect{e})=\dfrac{P(\vect{X}, \vect{E})}{P(\vect{E}=\vect{e})}\]
+The problem consists in estimating such joint probabilities when dealing with a large number of variables: directly working on the full joint probabilities would require time exponential in the number o variables. For instance, if all $N$ variables are discrete and take one of $K$ possible values, a joint probability table has $K^N$ entries. 
+\[P(\vect{X}\vert\vect{E}=\vect{e})=\dfrac{P(\vect{X}, \vect{E})}{P(\vect{E}=\vect{e})}=\Sum_{Y_1,\hdots,Y_n}P(\vect{X},Y_1,\hdots,Y_n,\vect{E}=\vect{e})\]
+Our goal is to exploit the structure in graphical models to do inference more efficiently.
+%
+%
+\subsection{Inference -- Chain}
+The most simple structure we have seen is a chain of nodes where each variable has a connection to the following one. 
+\begin{center}
+  \includegraphics[width=0.7\linewidth]{InferenceChain}
+\end{center}
+In this way the probability of all variables in the chain becomes:
+\[P(X)=P(X_1)\cdot P(X_2\vert X_1)\cdot \hdots \cdot P(X_{N}\vert X_{N-1})\]
+The marginal probability of an arbitrary variable $X_i$ is:
+\[P(X_i)=\Sum_{X_1}\Sum_{X_2}\hdots \Sum_{X_{i-1}}\Sum_{X_{i+1}}\hdots\Sum_{X_n}P(\vect{X})\]
+Suppose that $i=N$, then it's possible to see that only $P(X_N\vert X_{N-1})$ is involved in the last summation which can be computed first giving a function of $X_{N-1}$:
+\[\mu_\beta(X_{N-1})-=\Sum_{X_N}P(X_N\vert X_{N-1})\]
+Noe let's suppose that $i=N-1$, then the marginalization can be iterated as:
+\[\mu_\beta(X_{N-1})=\Sum_{X_{N-1}}P(X_{N-1}\vert X_{N-2})\mu_\beta(X_{N-1})\]
+One could decrease the value of $i$ and obtain the general function:
+\[\mu_\beta(X_i)=\Sum_{X_{i+1}}P(X_{i+1}\vert X_{i})\mu_\beta(X_{i+1})\]
+Now let's try to do the opposite and start from the front: 
+\[\mu_\alpha(X_2)=\Sum_{X_1}P(X_1)P(X_2\vert X_1)\]
+\[\mu_\alpha(x_3)=\Sum_{x_2}P(x_3\vert x_2)\mu_\alpha(x_2)\]
+It's possible to see the marginalization of the chain as a product of $\mu_\alpha$ and $\mu_\beta$. Indeed, we could write:
+\[P(X_i)=\mu_\alpha(X_i)\mu_\beta(X_i)\]
+We could think of $\mu_\alpha(X_i)$ and $\mu_\beta(X_i)$ as messages passing from $X_{i-1}$ to $X_{i}$ and from $X_{i+1}$ to $X_i$ respectively\footnote{$\alpha$ is passing the message forward, $\beta$ is passing the message backwards.}:
+\[\mu_\alpha=\Sum_{X_{i-1}}P(X_i\vert X_{i-1})\mu_\alpha(X_{i-1})\]
+\[\mu_\beta=\Sum_{X_{i+1}}P(X_{i+1}\vert X_{i})\mu_\beta(X_{i+1})\]
+%TODO add image here of message passing
+Each outgoing message is obtained by multiplying the incoming message by the local probability and summing over the node values. 
+Suppose we want to compute the marginal probabilities for a number of different variables $\vect{X}_i$. For each variable we should send a message from the beginning to the variable and from the variable to the end of the chain. Since the probabilities at each node is not going to change, then one could simply send a message from the beginning to the end and one from the end to the beginning. If all nodes store messages, we can compute any marginal probability as:
+\[P(\vect{X}_i)=\mu_\alpha(\vect{X}_i)\mu_\beta(\vect{X}_i)\]
+This does not count for evidence. If we were to consider also the case in which some nodes $\vect{X}_e$ are observed, then the formula would change and instead of summing over all possible values, we'd just use the observed values. For instance, let's consider the case in which we have 4 variables: $\vect{X}=\{X_1,X_2,X_3,X_4\}$, we could compute the probability of $\vect{X}$ as:
+\[P(\vect{X})=P(X_1)P(X_2\vert X_1)P(X_3\vert X_2)P(X_4\vert X_3)\]
+The marginal probability of $X_2$ and observations $X_1=x_{e_1}, X_3=x_{e_3}$ is:
+\[P(X_2,X_1=x_{e_1},X_3=x_{e_3})=\Sum_{X_1}\Sum_{X_3}\Sum_{X_4}P(\vect{X})\]
+\[P(X_2,X_1=x_{e_1},X_3=x_{e_3})=\Sum_{X_1}\Sum_{X_3}\Sum_{X_4}P(X_1)P(X_2\vert X_1)P(X_3\vert X_2)P(X_4\vert X_3)\]
+Since $X_1=x_{e_1}$ and $X_3=x_{e_3}$, we have:
+\[P(X_2,X_1=x_{e_1},X_3=x_{e_3})=P(X_1=x_{e_1})P(X_2\vert X_1=x_{e_1})P(X_3=x_{e_3}\vert X_2)\Sum_{X_4}P(X_4\vert X_3=x_{e_3})\]
+Whne adding evidence, the message passing procedure computes the joint probability of the variable and the evidence, hence it has to be normalized to obtain the conditional probability given the evidence:
+\[P(X_n\vert \vect{X}_e=\vect{x}_e)=\dfrac{P(X_n, \vect{X}_e=\vect{x}_e)}{\Sum_{X_n}P(X_n,\vect{X}_e=\vect{x}_e)}\]
+%
+%
+\subsection{Inference -- Trees}
+Obviously chains are not the only existing structure, but trees are another type of structure. In this case we can consider three cases:
+\begin{itemize}
+  \item \textbf{Undirected trees}: undirected graphs with a single path for each pair of nodes.
+  \item \textbf{Directed trees}: directed graphs with a single node with no parentes (root) and all the other nodes with a single parent.
+  \item \textbf{Directed polytrees}: directed graphs with multiple parents for node and multiple roots, but still a single (undirected) path between each pair of nodes. 
+\end{itemize}
+\begin{minipage}[htp]{\linewidth}
+  \begin{center}
+    \begin{minipage}{0.3\linewidth}
+      \begin{center}
+        \includegraphics[height=3.5cm]{InferenceTrees1}\\
+        Undirected trees.
+      \end{center}
+    \end{minipage}
+    \hspace{0.01\linewidth}
+    \begin{minipage}{0.3\linewidth}
+      \begin{center}
+        \includegraphics[width=\linewidth]{InferenceTrees2}\\
+        Directed trees.
+      \end{center}
+    \end{minipage}
+    \hspace{0.01\linewidth}
+    \begin{minipage}{0.3\linewidth}
+      \begin{center}
+        \includegraphics[height=3.5cm]{InferenceTrees3}\\
+        Directed polytrees.    
+      \end{center}
+    \end{minipage}
+  \end{center}
+\end{minipage}\\
+\vspace{0.3cm}
+Since explaining these structures per se is quite troublesome, we are introducing \textbf{facto graphs}.
+%
+%
+\subsection{Inference -- Factor Graph}
+Factor graphs are an alternative graphical representation which is useful to better explain inference algorithms. \newline
+A factor graph is a graphical representation of a graphical model highlighting its factorization, i.e., its conditional probabilities. A factor graph has one node for each node in the original graph, one additional node for each factor (evidence) and undirected links to each of the node variables in the factor. \newline
+Mind that each node factor needs to be linked to all the nodes from which the decomposition comes from. \newline
+Let's consider for example the following probability distribution:
+\[P(X_3\vert X_1,X_2)P(X_1)P(X_2)\]
+We know that a Bayesian Network representation can be:
+\begin{center}
+  \includegraphics[scale=0.3]{FactorGraphExample1_1}
+\end{center}
+We could notice that actually $X_3$ is conditioned on $X_1$ and $X_2$ and hence we could create a factor node $f$ as follows:
+\begin{center}
+  \includegraphics[scale=0.3]{FactorGraphExample1_2}
+\end{center}
+Actually $f$ can be thought as a function:
+\[f(X_1,X_2,X_3)=P(X_3\vert X_1,X_2)P(X_1)P(X_2)\]
+Now then it's possible to add also other two factor nodes which would express the probability of the nodes $X_1$ and $X_2$. 
+\[f_c(X_1,X_2,X_3)=P(X_3\vert X_1,X_2)\]
+\[f_a(X_1)=P(X_1)\]
+\[f_b(X_2)=P(X_2)\]
+\begin{center}
+  \includegraphics[scale=0.3]{FactorGraphExample1_3}
+\end{center}
+%
+%
+\subsection{Sum-Product Algorithm}
+The sum-product algorithm is an efficient algorithm for exact inference on tree-structured graphs. As the version for the chains, also this is a message passing algorithm. \newline
+This algorithm is applicable to undirected models, i.e., Markov Networks, as well as directed ones, i.e., Bayesian Networks. 
+We will now present it on factor graphs assuming a tree-structured graph giving rise to a factor graph which is a tree. \newline
+%
+\subsubsection{Computing Marginals}
+To compute the probability of a single variable, one sums over the probabilities of all variables except the one for which they wish to compute the marginal. \newline
+\[P(X)=\Sum_{\vect{X}\setminus X}P(\vect{X})\]
+Since $X$ is a node, then the probability $P(X)$ of an event is the product of all the incoming messages from the neighbouring factors $f_s$:
+\[P(X)=\Prod_{f_s\in \neigh(X)}\mu_{f_s\rightarrow X}(X)\]
+where $\neigh(X)$ are the neighbours of $X$.
 
 
-\section{d-separation}
-Abbiamo visto le 3 diverse strutte nel caso di 3 nodi. Consider tail to tail and for example earthquake->alarm, burglar->alarm if you see the alarm you can think of the burglar, but if you see earthquake, than for sure it's not a burglar, so the two fathers are related. \newline
-If we add a fourth node phone call from alarm, then
-\subsection{Definition}
-Consideriamo un grafo come quello in figura. Vogliamo fare dei calcoli arbitrari sulla dipendenza, per esempio che A=x1, x2 sono indiependenti da B=x5 e x7 e un altro set $C=\emptyset$. Possiamo usare le regole che abbiamo visto adesso. Praticamente per ogni nodo in un set dobbiamo vedere tutti i possibbili percorsi che ci portano a un altro set e sfruttando le regole di prima possiamo dire che non esiste un passo se ad esempio abbiamo tail to tail o head to tail con evidence nel mezzo, oppure head to head senza evidence. So x4->x6 is head to tail, non ho informazione quindi è libero, x4,x5,x6 è head to head e non c'è evidence quindi è bloccato. Consideriamo il percorso x1x4x6x7, i primi 3 sono head to tail senza evidence quindi posso passare, e anche dopo x4x6x7. \newline
-Supponiao ora che $C$ contenga x6, allora il path 3 è bloccato, mentre il path 1 non è più bloccato perchè x6 diventa evidence.\newline
-$C$ quindi è il set con l'evidence. 
-\section{BN independences}
-Abbiamo visto le indipendenze locali, ossia indiepndenze dei nodi rispetto a tutto il resto. A questo si aggiungono indipendenze globali (che racchiudono anche le primme), definire come in slide. \newline
-\section{Equivalence classes}
-Possiamo raggruppare le indipendenze in classi, ad esempio head-to-head in una direzione o nell'altra producono la stessa cosa, come anche tail to tail nel caso senza evidence. Due strutture sono nella stessa classe si equivalenza se codificano la stessa dipendenza. In principio ogni struttura da una classe è equivalente per rappresentare i dati. \newline
-\section{l-maps}
-Per riuscire ad avere un buon modello bisogna riuscire a codificareil amggior numero di strutture, quindi abbbiamo una definizone di mappa minima come quella in slide. Questo non soddisfa il fatto che riusciamo a prendere tutte le dipendenze. \newline
-Al contrario una mappa perfetta è una mappa che riesce a prendere tutte le dipendenze. Ovviamente una mappa perfetta è anche minima, ma non viceversa. Esiste un algoritmo per trovare una mappa perfetta per una distribuzione ed è esponenziale rispetto al numero di connessioni massime che un nodo ha. Ci sono della distribuzione che non hanno delle mappe perfette, per risolvere queste distribuzioni si usano dei grafi non diretti chiamati Markov Networks. \newline
-\section{Making bayesian networks}
-Un esperto deve fornirci le variabili di interesse, ad esempio i sintomi e quello che potremmo voler trovare. A questo punto vogliamo costruire dei collegamenti e per fare questo vogliamo collegare varaibili che sono in relazione causale, questo ci permette di avere anche un grafo con meno collegamenti. A questo punto dobbiamo mettere le probabilità per ogni configurazione. \newline
-Quello che si fa di solito è prendere un sacco di dati e imparare i parametri e in alcuni casi anche la struttura (partendo comunque da una struttura minima).
-\section{Inference in graphical model}
-Un BN, come tutti i cosi grafici, modella una probabilità congiunta. Per questo motivo si ha:
-\begin{center}
-	$\displaystyle P(X\vert E=e)=\frac{p(X,E=e)}{P(E=e)}$
-\end{center}
-Vedi fogli \ins(6) ma è troppo grande, quindi possiamo usare la scomposizione. La struttura più semplice che possiamo pensare è una catena dove ogni varaibile ha una connessione a quella dopo. In questo modo la probabilità di tutte le variabili nella reteè:
-\begin{center}
-	$\displaystyle P(X)=P(x1)P(X2\vert x1)...P(x_{N}\vert x_{N-1})$
-\end{center}
-Supponiamo di voler calcolare la probailità di una variabile senza condizione:
-\begin{center}
-	$\displaystyle P(x_n)=\sum_{x_1}...\Sum_{x_N}P(X)$
-\end{center}
-In questo modo ad esempio $\Sum_{x_N}$ è solo la parte finale della formula di prima e tutto il resto invece è costante:
-\begin{center}
-	$\displaystyle \mu_\beta(x_{n-1})=\Sum_{x_N}P(x_N\vert x_{N-1})$
-\end{center}
-Se ora si sommano tutti i valori si ottiene 1, ma non sempre??????\newline
-Possiamo rsicrivere come: 
-\begin{center}
-	$\displaystyle \sum_{x_1}...\Sum_{x_{N-1}}P(x_1)P(x_2\vert x_1)...P(x_{n-1}\vert x_{n-2})\mu_\beta(x_{n-1})$
-\end{center}
-A questo punto consideriamo la sommatoria per $n-1$ ed è la stessa cosa, tutto costante tranne l'ultima cosa:
-\begin{center}
-	$\displaystyle \mu_\beta(x_{n-2})=\Sum$
-\end{center}
-E continuo fino ad arrivare da qualche parte e si ha:
-\begin{center}
-	$\displaystyle \mu_\beta(x_n)=\Sum_{x_{n+1}}P(x_{n+1}\vert x_n)\mu_\beta(x_{n+1})$
-\end{center}
-Ora manca qualche altra sommatora, cioè non ci si capisce più niente e andadno al contrario si ha:
-\begin{center}
-	$\displaystyle \mu_\alpha(x_2)=\Sum_{x_1}P(x_1)P(x_2\vert x_1)$\\
-	$\displaystyle \mu_\alpha(x_3)=\Sum_{x_2}P(x_3\vert x_2)\mu_\alpha(x_2)$
-\end{center}
-E alla fine si ha mettendo tutto insieme che:
-\begin{center}
-	$\displaystyle p(X_n)=\mu_\alpha(X_n)\mu_\beta(X_n)$
-\end{center}
-Migliorando le prestazioni per qualche altro motivo portandole da esponenziali a qualcos'altro.\newline 
-Possiamo pensare a $\mu$ come un messaggio e mandarlo avanti $\alpha$ o indietro (backwards) $\beta$.\newline
-Supponiamo di avere fatto tutti i calcoli e mandati i messaggi e abbbiamo la nostra rete e dobbiamo computare $X_{n+1}$ quindi dovremmo ricominciare a mandare tutti i messaggi, ma la maggior parte sono li stessi quindi non vogliamo ricalcolarli. Al posto di fare questo si manda un messaggio dall'inizio alla fine e dalla fine all'inizio e boh. \newline
-Questo è tutto senza evidence, ma di solito abbiamo anche questa. Dobbiamo quindi modiifcare l'algoritmo per tenere conto dell'evidence: abbiamo calcolato $P(x_n)$.\newline
-Questo funziona con le catene, ma non sono l'unico tipo di struttura. altri tipo di struttura sono gli alberi ossia strutture dove ogni nodo ha un solo genitore, uno che non ha padri che è la radice e nodi che non hanno figli che sono le foglie, oppure poly-tree: si ha comunque un solo percorso tra coppie di nodi. Anche gli undirected trees, questo perchè l'inferenza che abbiamo visto prima è valida sia per BN che per Markov Networks. 
-\section{Factor graph}
-Il modo per parlare di queste strutture da catenre è passare per una struttura intermedia chiamata factor graph utile solo per fare gli inference graph. \newline
-Questo grafo ha un nodo per ogni variabbile e anche nodi (detti factor nodes) per ogni evidence (forse= che ha. È anche un grafo non direzionale. \newline
-Ogni nodo factor deve essere collegato a tutti i nodi delle probabilità da cui deriva la scomposizione. 
+Dato un nodo $x_i$, possiamo scrivere il messaggio in uscita $\mu_{\alpha}(x_{i+1})$ come:
+\[\mu_{\alpha}(x+1)=\Sum_{X_i}P(x_{i+1}\vert x_i)\mu_\alpha(x_i)\]
+Quindi possiamo scrivere il messaggio $\mu_{f_i\rightarrow x}(x)$ come: 
+\[ \mu_{f\rightarrow x}(x)=\Sum_{x_i...x_m}f(x_1, ..., x_m)\Pi_{x_f\in}\]
+Possiamo vedere che sia se il messaggio è da un factor a un nodo, sia che il messaggio sia da un nodo a un factor, si tratta comunque di una funzione del nodo. \newline 
+vedi fogli che forse si capisce qualcosa di più
+
+
