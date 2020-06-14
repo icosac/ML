@@ -110,11 +110,11 @@ Let's consider another example: genes A and B have independent prior probabiliti
 \begin{table}[!h]
 	\centering
 	\begin{tabular}{cc|cc|cc}
-		\multicolumn{2}{c|}{}&\multicolumn{4}{c}{A}\\
-		\multicolumn{2}{c|}{}&\multicolumn{2}{c}{Active}&\multicolumn{2}{c}{Inactive}\\
+		\mc{2}{c|}{}&\mc{4}{c}{A}\\
+		\mc{2}{c|}{}&\mc{2}{c}{Active}&\mc{2}{c}{Inactive}\\
 		\hline
-		\multicolumn{2}{c|}{}&\multicolumn{2}{c|}{B}&\multicolumn{2}{c}{B}\\
-		\multicolumn{2}{c|}{}&Active&Inactive&Active&Inactive\\
+		\mc{2}{c|}{}&\mc{2}{c|}{B}&\mc{2}{c}{B}\\
+		\mc{2}{c|}{}&Active&Inactive&Active&Inactive\\
 		\hline
 		C&Active&0.9&0.6&0.7&0.1\\
 		C&Inactive&0.1&0.4&0.3&0.9
@@ -561,13 +561,385 @@ To compute the probability of a single variable, one sums over the probabilities
 Since $X$ is a node, then the probability $P(X)$ of an event is the product of all the incoming messages from the neighbouring factors $f_s$:
 \[P(X)=\Prod_{f_s\in \neigh(X)}\mu_{f_s\rightarrow X}(X)\]
 where $\neigh(X)$ are the neighbours of $X$.
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{FactorGraphInference1_1}
+\end{center}
+Each factor message is the product of messages coming from nodes other than $X$, times the factor, summed over all possible values of the factor variables other than $X$:
+\[\mu_{f_s\rightarrow X}(X)=\Sum_{X_1}\hdots\Sum_{X_M} f_s(X,X_1,\hdots,X_M)\Prod_{X_m\in\neigh(f_s)\setminus X}\mu_{X_m\rightarrow f_s}(X_m)\]
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{FactorGraphInference1_2}
+\end{center}
+Now it's possible to notice that each message from node $X_m$ to factor $f_s$ is the product of the factor message to $X_m$ coming from factors other than $f_s$:
+\[\mu_{X_m\rightarrow f_s}(X_m)=\Prod_{f_l\in\neigh(X_m)\setminus f_s}\mu_{f_l\rightarrow X_m}(X_m)\]
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{FactorGraphInference1_3}
+\end{center}
+Knowing these informations, we can move to the algorithm. First of all the message passing starts from the leaves, either factors or nodes. \newline
+If the leaf is a factor, the message is initialized to the factor itself, indeed there would be no $X_m$ different from the destination on which to sum over:
+\[\mu_{f\rightarrow x}(x)=f(x)\]
+If the leaf is a node, the message is initialized to 1:
+\[\mu_{x\rightarrow f}(x)=1\]
+Now the node $X$ whose marginal has to be computed is designed as root. Messages are sent from all leaves to their neighbours. Each internal node sends its message towards the root as soon as it has received the messages from all the other neighbours. Once the root has collected all messages, the marginal can be computed as the product of them. 
+\begin{center}
+  \begin{minipage}[htp]{\linewidth}
+    \begin{minipage}[t]{0.48\linewidth}
+      \begin{center}
+        \includegraphics[width=0.6\linewidth]{FactorGraphInference1_4}\\
+      \end{center}
+      If the leaf is a factor, then the message is initialized to the factor itself.
+    \end{minipage}
+    \hspace{0.02\linewidth}
+    \begin{minipage}[t]{0.48\linewidth}
+      \begin{center}
+        \includegraphics[width=0.6\linewidth]{FactorGraphInference1_5}\\
+      \end{center}
+      If the leaf is a node, then the message is initialized to 1.
+    \end{minipage}
+  \end{minipage}
+\end{center}
+One should remember that for the chain structure the best approach was to send a message from one end to the other and another one on the opposite direction. Similarly, this can be done also for a tree structure: once the root as computed the marginal, send the value back to all the leaves. This allows to pass all messages in all directions using only twice the number of computations used for a single marginal. 
+%
+\subsubsection{Example}
+Let's consider the following factor graph: 
+\begin{center}
+  \includegraphics[width=0.7\linewidth]{FactorGraphExample2}
+\end{center}
+Which has the following joint distribution: 
+\[P(\vect{X})=f_a(X_1,X_2)f_b(X_2,X_3)f_c(X_2,X_4)\]
+Let's consider the case in which we choose $X_3$ has the root of the tree, hence $X_1$ and $X_4$ are the leafs. Since they are nodes, then the messages are initialized to 1:
+\[\mu_{X_1\rightarrow f_a}(X_1)=1\]
+\[\mu_{X_4\rightarrow f_c}(X_4)=1\]
+By definition, the message from factors to nodes is the product of the messages coming from nodes other then $X_i$, times the factor, summed over all possible values of the factor variables other than $X_i$. Since for both factors $f_a$ and $f_c$ there is only one node before, hence one single message which value is 1, then it's possible to write:
+\[\mu_{f_a\rightarrow X_2}(X_2)=\Sum_{X_1}f_a(X_1,X_2)\]
+\[\mu_{f_c\rightarrow X_2}(X_2)=\Sum_{X_4}f_a(X_2,X_4)\]
+Now we need to send a message from the node $X_2$ to the factor $f_b$, and by definition, such message is the product of the message arriving to $X_2$:
+\[\mu_{X_2\rightarrow f_b}(X_2)=\mu_{f_a\rightarrow X_2}(X_2)\mu_{f_c\rightarrow X_2}(X_2)\]
+Then the message from $f_b$ to $X_3$ can be written as:
+\[\mu_{f_b\rightarrow X_3}(X_3)=\Sum_{X_2}f_b(X_2,X_3)\mu_{X_2\rightarrow f_b}(X_2)\]
+Now we need to do the opposite, that is, start from $X_3$ and go towards the leaves. Since $X_3$ is a node, then the message is initialized to 1:
+\[\msg{X_3}{f_b}{X_3}=1\]
+From factor $f_b$ to factor node $X_2$ we have:
+\[\msg{f_b}{X_2}{X_2}=\Sum_{X_3}f_b(X_2, X_3)\]
+From $X_2$ to factors $f_a$ and $f_c$:
+\[\msg{X_2}{f_a}{X_2})=\msg{f_b}{X_2}{X_2}\msg{f_c}{X_2}{X_2}\]
+\[\msg{X_2}{f_c}{X_2})=\msg{f_b}{X_2}{X_2}\msg{f_a}{X_2}{X_2}\]
+Finally the message to the leaves are:
+\[\msg{f_a}{X_1}{X_1})=\Sum_{X_2}f_a(X_1, X_2)\msg{X_2}{f_a}{X_2}\]
+\[\msg{f_c}{X_4}{X_4})=\Sum_{X_2}f_c(X_2, X_4)\msg{X_2}{f_c}{X_2}\]
+Now that we have all the information that we need, we could for example decide to compute the marginal probability of $X_2$. We know that the marginal can be computed as the product of all the incoming messages:
+\[P(\vect{X})=\msg{f_a}{X_2}{X_2}\msg{f_b}{X_2}{X_2}\msg{f_c}{X_2}{X_2}\]
+By expanding each message as written before, we obtain:
+\[=\left[\Sum_{X_1}f_a(X_1, X_2)\right]\left[\Sum_{X_3}f_b(X_2, X_3)\right]\left[\Sum_{X_4}f_c(X_2, X_4)\right]\]
+\[=\Sum_{X_1}\Sum_{X-3}\Sum_{X_4}f_a(X_1,X_2)f_b(X_2,X_3)f_c(X_2,X_4)\]
+But the product of all factors is nothing but the initial distribution:
+\[=\Sum_{X_1}\Sum_{X-3}\Sum_{X_4}P(\vect{X})\]
+This "proves" that we could use just two passing of messages to compute the marginal probabilities. \newline
+%
+\subsubsection{Example -- Adding Evidence}
+As said before, if any node is observed, then we simply use their observed values instead of summing over all possible values when computing their messages. After normalization this gives the conditional probability given the evidence. \newline
+Consider for example the following probability distribution:
+\[P(B\vert A,C)P(A)P(C\vert D)P(D)\]
+Let's now represent this via a Bayesian Network:
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{FactorGraphExample3_1}
+\end{center}
+We could convert it to a factor graph by looking at its probability distribution and adding a function for each probability:
+\begin{center}
+  \includegraphics[width=0.6\linewidth]{FactorGraphExample3_2}
+\end{center}
+Let's consider the case in which we'd like to compute the marginal of $B$. Notice that when we know which node we want to compute the probability of, then we can just use one passage of messages. So let's make $B$ the root of the tree and start from $f_a$ and $f_d$ which are the leaves. Since the leaves are factors, then we can use directly their probability:
+\[\mu_{f_A\rightarrow A}=P(A)\]
+\[\mu_{f_D\rightarrow D}=P(D)\]
+This are the incoming messages to $A$ and $D$ respectively. Now let's compute the outgoing messages; since both $A$ and $B$ do not have any factor except for $f_A$ and $f_D$ respectively, then their messages are:
+\[\msg{A}{f_{A,B,C}}{A}=\mu_{f_A\rightarrow A}=P(A)\]
+\[\msg{D}{f_{C,D}}{D}=\mu_{f_D\rightarrow D}=P(D)\]
+Now let's wait for the branch of $A$ and focus on the branch of $C$ and $D$. We'll send a message from factor $f_{C,D}$ to node $C$. In this case we'll have to sum over all possible values of $D$: 
+\[\msg{f_{C,D}}{C}{C}=\Sum_{D}P(C\vert D)\msg{D}{f_{C,D}}{D}=\Sum_DP(C\vert D)P(D)\]
+We can now also send the message from $C$ to factor $f_{A,B,C}$:
+\[\msg{C}{f_{A,B,C}}{C}=\msg{f_{C,D}}{C}{C}=\Sum_DP(C\vert D)P(D)\]
+At last the factor $f_{A,B,C}$ sends a message to the node $B$:
+\[
+  \begin{array}{ll}
+    \msg{f_{A,B,C}}{B}{B}&=\Sum_A\Sum_CP(B\vert A,C)\msg{C}{f_{A,B,C}}{C}\msg{A}{f_{A,B,C}}{A}\\
+                         &=\Sum_A\Sum_CP(B\vert A,C)P(A)\Sum_DP(C\vert D)P(D)
+  \end{array}
+\]
+Since the marginal probability of a node is the product of all incoming messages to the node, we have:
+\[
+  \begin{array}{ll}
+    P(B)=\msg{f_{A,B,C}}{B}{B}&=\Sum_A\Sum_CP(B\vert A,C)P(A)\Sum_DP(C\vert D)P(D)\\
+                              &=\Sum_A\Sum_C\Sum_DP(B\vert A, C)P(A)P(C\vert D)P(D)\\
+                              &=\Sum_A\Sum_C\Sum_DP(A,B,C,D)
+  \end{array}
+\]
+%
+\subsection{Most Probable Configuration}
+Consider the following case: we are given a joint probability distribution $p(\vect{X})$ and our goal is to find the configuration for variables $\vect{X}$ having the highest probability:
+\[\vect{X}^{\text{max}}=\argmax{\vect{X}}P(\vect{X})\]
+for which the probability is:
+\[P(\vect{X}^{\text{max}})=\max\limits_{\vect{X}}P(\vect{X})\]
+For instance, we are not interested in computing the probability that in the next days it'll rain, but in knowing which is the most probable weather during the next week. \newline
+Notice that we are trying to find the configuration which is jointly maximal for all variables, that is if the variables are not independent, we cannot simply compute $P(X_i)$ for each $i$ and then maximize. \newline
+As for the sum-product algorithm, we can exploit the distribution factorization to efficiently compute the maximum:
+\[P(\vect{X}^{\text{max}})=\max\limits_{\vect{X}}P(\vect{X})=\max\limits_{X_1}\hdots\max\limits_{X_M}P(\vect{X})\]
+All we have done is to replace the sum from the sum-product algorithm with a $\max$ function. When doing these maximizations, we are actually ignoring all the variables that are not the variable we are trying to maximize.
+%
+\subsubsection{Chain Example}
+Let's consider a simple chain:
+\begin{center}
+  \includegraphics[width=0.5\linewidth]{MPCExample1}
+\end{center}
+And let's say that the variables can take the following values: $X_1=\{\text{Rainy, Cloudy, Sunny}\},~ X_2=\{T,F\},~ X_3=\{T,F\}$. The probability for $X_1$ and the conditional probabilities are the following:
+\begin{center}
+  \begin{tabular}{cc|c|}
+    \cline{3-3}
+    \multirow{3}{*}{$X_1$}&R&0.2\\
+    \cline{3-3}
+                          &C&0.2\\
+    \cline{3-3}
+                          &S&0.6\\
+    \cline{3-3}
+  \end{tabular}
+  \hspace{1cm}
+  \begin{tabular}{C{0.2cm}c}
+          &$X_1$\\
+    $X_2$&
+      \begin{tabular}{c|c|c|c|}
+        \mc{1}{c}{}&\mc{1}{c}{R}&\mc{1}{c}{C}&\mc{1}{c}{S}\\
+        \cline{2-4}
+        T&0.2&0.4&0.8\\
+        \cline{2-4}
+        F&0.8&0.6&0.2\\
+        \cline{2-4}
+      \end{tabular}
+  \end{tabular}
+  \hspace{1cm}
+  \begin{tabular}{C{0.2cm}c}
+          &$X_2$\\
+    $X_3$&
+      \begin{tabular}{c|c|c|}
+        \mc{1}{c}{}&\mc{1}{c}{T}&\mc{1}{c}{F}\\
+        \cline{2-3}
+        T&0.8&0.4\\
+        \cline{2-3}
+        F&0.2&0.6\\
+        \cline{2-3}
+      \end{tabular}
+  \end{tabular}
+\end{center}
+The joint probability of a chain is:
+\[P(\vect{X})=P(X_3\vert X_2)P(X_2\vert X_1)P(X_1)\]
+Our goal is to find the values for $X_1,X_2,X_3$ that maximize the joint probability. \newline
+Each maximization can be seen as an outgoing message ($\mu_\beta$) where instead of having a sum we are actually maximizing. For instance:
+\[\mu_\beta(X_2)=\max\limits_{X_3}P(X_3\vert X_2)=
+  \begin{cases}
+    \begin{array}{ll}
+      0.8&\text{if }X_2=T\\
+      0.6&\text{if }X_2=F\\
+    \end{array}
+  \end{cases}
+\]
+The result is due to the fact that, looking at the rightmost table, fixating a value for $X_2$, it's possible to find the maximum probability, for instance, if $X_2$ is $T$, then the $P(X_3=T\vert X_2=T)>P(X_3=F\vert X_2=T)$. \newline
+The same can be done to compute the value for $X_2$:
+\[\mu_\beta(X_1)=\max\limits_{X_2}P(X_2\vert X_1)\mu_\beta(X_2)=
+\begin{cases}
+  \begin{array}{ll}
+    0.48&\text{if }X_1=R\\
+    0.36&\text{if }X_1=C\\
+    0.64&\text{if }X_1=S
+  \end{array}
+\end{cases}
+\]
+In order to compute this we have to look at the center table above. First let's consider the case in which $X_1=R$, then we could have $P(X_1=R\vert X_2=T)=0.2$, or $P(X_1=R\vert X_2=F)=0.8$. We want to check both of these possibilities and take the highest value:
+\[P(X_1=R\vert X_2=T)\mu_\beta(X_2=T)=0.2\cdot 0.8=0.16\]
+\[P(X_1=R\vert X_2=F)\mu_\beta(X_2=F)=0.8\cdot 0.6=0.48\]
+Then we choose the highest value, that is $0.48$. The same reasoning is applied for $P(X_1=C\vert X_2)$ and $P(X_1=S\vert X_2)$
+\[P(X_1=C\vert X_2=T)\mu_\beta(X_2=T)=0.4\cdot 0.8=0.48\]
+\[P(X_1=C\vert X_2=F)\mu_\beta(X_2=F)=0.6\cdot 0.6=0.36\]
+\[P(X_1=S\vert X_2=T)\mu_\beta(X_2=T)=0.8\cdot 0.8=0.64\]
+\[P(X_1=S\vert X_2=F)\mu_\beta(X_2=F)=0.2\cdot 0.6=0.12\]
+At last we can compute the maximum configuration probability:
+\[P(\vect{X}^{\text{max}})=\max\limits_{X_1}P(X_1)\mu_\beta(X_1)=\max\limits_{X_1}
+  \begin{bmatrix}
+    0.48\cdot 0.2\\
+    0.36\cdot 0.2\\
+    0.64\cdot 0.6
+  \end{bmatrix}
+  =0.64\cdot 0.6=0.384
+\]
+The most likely configuration for $X_1$ is:
+\[\argmax{X_1}P(X_1)\mu_\beta(X_1)=S\]
+Then to know the most likely configuration for $X_2$ all we need to do is to go back to the computation of $\mu_\beta(X_1)$ and look to which value gave the highest probability when $X_1=S$, that is when $X_2=T$, $P(X_1=S\vert X_2=T)\mu_\beta(X_2)=0.64$. \newline
+The same is done for $X_3$ keeping in mind that now we know that $X_2=T$: given such information, the highest probability is obtained for $X_3=T$, $P(X_3=T\vert X_2=T)=0.8$. \newline
+This action of retrieving the correct configuration going backwards is called \textbf{backpropagation}. 
+%
+\subsubsection{Tree}
+As we saw in the example before, the max-product algorithm can be seen as a message passing over the graph. The algorithm is thus easily applied to tree-structured graphs via their factor trees: all one needs to do is to change the sum with a maximization:
+\[\msg{f}{X}{X}=\max\limits_{X_1,\hdots,X_M}\left[f(X, X_1, \hdots, X_M)\Prod_{X_m\in\neigh(f)\setminus X}\msg{X_m}{f}{X_m}\right]\]
+\[\msg{X}{f}{X}=\Prod_{f_l\in\neigh(X)\setminus f}\msg{f_l}{X}{X}\]
+As the sum-product algorithm, once a root $X_r$ is chosen, the leaves send messages towards the root. The probaility of the maximal configuration is readily obtained as:
+\[P(\vect{X}^{\text{max}})=\max\limits_{X_r}\left[\Prod_{f_l\in\neigh(X_r)}\msg{f_l}{X_r}{X_r}\right]\]
+The maximal configuration for the root is obtained as:
+\[X_r^{\text{max}}=\argmax{X_r}\left[\Prod_{f_l\in\neigh(X_r)}\msg{f_l}{X_r}{X_r}\right]\]
+We now need to recover the maximal configuration for the other variables. When sending a message towards $x$, each factor node should store the configuration of the other variables which gave the maximum:
+\[\phi_{f\rightarrow X}(X)=\argmax{X_1,\hdots, X_M}\left[f(X,X_1,\hdots,X_M)\Prod_{X_m\in\neigh(f)\setminus X}\msg{X_m}{f}{X_m}\right]\]
+When the maximal configuration for the root node $X_r$ has been obtained, it can be used to retrieve the maximal configuration for the variables in neighbouring factors from:
+\[X_1^{\text{max}},\hdots,X_M^{\text{max}}=\phi_{f\rightarrow X_r}\left(X_r^{\text{max}}\right)\]
+The procedure can be repeated \textit{back-tracking} to the leaves, retrieving maximal values for all variables. \newline
+For the chain we saw before, back-tracking resolves in:
+\[
+  \begin{array}{lll}
+    X_N^{\text{max}}&=&\argmax{X_N}\msg{f_{N-1,N}}{X_N}{X_N}\\
+    X_{N-1}^{\text{max}}&=&\phi_{f_{N_1,N}\rightarrow X_N}(X_{N}^{\text{max}})\\
+    X_{N-2}^{\text{max}}&=&\phi_{f_{N_2,N-1}\rightarrow X_{N-1}}(X_{N-1}^{\text{max}})\\
+                        &\vdots&\\
+    X_{1}^{\text{max}}&=&\phi_{f_{1,2}\rightarrow X_2}(X_{2}^{\text{max}})\\
+  \end{array}
+\]
+%
+\subsubsection{Trellis}
+It's possible to visualize the best configuration by using a trellis diagram which shows the $K$ possible states of each variable $X_n$ one per row. For each state $k$ of a variable $X_n$, $\phi_{f_{n-1, n}\rightarrow X_n}(X_n)$ defines a unique (maximal) previous state, linked by an edge in the diagram. \newline
+Once the maximal state for the last variable $X_N$ is chosen, the maximal states for other variables are recovered following the edges backwards. 
+\begin{center}
+  \includegraphics[width=0.6\linewidth]{InferenceTrellis}
+\end{center}
+\data{30/10/2019}
+%
+\subsubsection{Underflow}
+The max-product algorithm relies on products, but the multiplication of small numbers (probabilities) can lead to underflow problems. This can be solved by considering $\log(\max(P(\vect{X})))$ instead of simply $\max(P(\vect{X}))$. \newline
+Since the logarithm is monotonic, we have that the proper maximal configuration is recovered:
+\[\log\left(\max\limits_{\vect{X}}P(\vect{X})\right)=\max\limits_{\vect{X}}\log(P(\vect{X}))\]
+Moreover we know that, by the properties of logarithms, the multiplication of logarithms can be converted into a sum, giving the \textit{max-sum} algorithm. \newline
+%
+%
+\subsection{Exact Inference -- Junction Tree Algorithm}
+Let's see how to deal with inference when the network structure is not as nice as the ones we have seen until now. Indeed many applications require graphs with (undirected loops), so we acutally need an extension of the max-product algorithm to generic graphs. \newline
+Such new algorithm is called \textbf{junction tree} algorithm. As the name suggests, this algorithm does not work on factor graphs, but on junction trees, i.e., tree-structured graphs with nodes containing clusters of variables of the original graph. Then a message passing scheme similar to the sum-product and max-product algorithms is run on the junction tree. \newline
+Notice though that such an algorithm is exponential on the maximal number of variables in a cluster, making it intractable for large complex graphs. 
+%
+%
+\subsection{Approximate Inference}
+If the graph is too large or complex and the junction tree algorithm is not usable, then we can resort to \textit{approximate} techniques such as:
+\begin{itemize}
+  \item \textit{Loopy belief propagation}: message passing on the original graph even if it contains loops;
+  \item \textit{Variational methods}: deterministic approximations, assuming the posterior probability (given the evidence) factorizes in a particular way;
+  \item \textit{Sampling methods}: approximate posterior is obtained sampling from the network.
+\end{itemize}
+%
+\subsubsection{Loopy Belief Propagation}
+The idea is simply to apply the sum-product algorithm even if it is not guaranteed to provide an exact solution. \newline
+We assume all nodes are in condition of sending messages, i.e., they already received a constant 1 message from all neighbours. \newline
+A message passing schedule is chosen in order to decide which nodes start sending messages, e.g., flooding. \newline
+The information than flows many times around the graph (because of loops), each message on a link replaces the previous one and is only based on the most recent messages received from the other neighbours. \newline
+The algorithm can eventually converge depending on the specific model over which it is applied. 
+%
+\subsubsection{Sampling Methods}
+Given the joint probability distribution $P(\vect{X})$, we want to compute $P(\vect{Y}=\vect{y}\vert \vect{E}=\vect{e})$. A sample from the distribution is an instatiation of all the variables $\vect{X}$ according to the probability $P$, that is the "output" of the distribution probability $P$ applied to some input $\vect{X}$. \newline
+Samples can be used to approximate the probability of a certain assignment $\vect{Y}=\vect{y}$ for a subset $\vect{Y}\subset\vect{X}$ of the variables: we simply count the fraction of samples which are consistent with the desired assignment. \newline
+We usually need to sample from a posterior distribution given some evidence $\vect{E}=\vect{e}$.
+The problem is that sampling from a distribution is difficult. We need to build to a process that allows us to do this and this is, for example the \textit{Markov Chain Monte Carlo}. 
+\myparagraph{Markov Chain Monte Carlo}
+We usually cannot directly sample from the posterior distribution since this would be too expensive. What we can do instead is to build a random process which gradually samples from distribution closer and closer to the posterior. \newline
+The state of the process is an instatiation of all the variables. \newline
+The process can be seen as randomly traversing the graph of states moving from one state to another with a certain probability. After enough time, the probability of being in any particular state is the desired posterior. \newline
+In this specific case, the random process is a Markov Chain. 
+%
+\subsubsection{Sampling Methods -- Markov Chain}
+The state graph is very different from the graphical model of the joint distribution:
+\begin{itemize}
+  \item Nodes in the graphical model are variables;
+  \item Nodes in the state graph are instatiations of all the variables.
+\end{itemize}
+\begin{definition}[Markov Chain]
+  A Markov Chain consists of:
+  \begin{itemize}
+    \item A space $Val(\vect{X})$ of possible states, one for each possible instatiation of all variables $\vect{X}$;
+    \item A \textit{transition probability model} defining for each state $\vect{x}\in Val(\vect{X})$ a \textit{next-state} distribution over $Val(\vect{X})$:
+      \[\mathcal{T}(\vect{x}\rightarrow \vect{x}')\]
+  \end{itemize}
+\end{definition}
+A Markov chain \textit{defines a stochastic process that evolves from state to state}. 
+\begin{definition}[Homogeneous Chains]
+  A Markov chain is said to be homogeneous if its transition probability model does not change over time.
+\end{definition}
+Transition probabilities between states do not depend on the particular time instant in the process: such are the chains we'll use for sampling. \newline
+Consider a sequence of states $\vect{x}^{(0)},\vect{x}^{(1)},\vect{x}^{(2)},\hdots$ of the random process. \newline
+Being random, the state of the process at time $t$ can be seen as a random variable $\vect{X}^{(t)}$. Assume the initial state $\vect{X}^{(0)}$ is distributed according to some initial probability $p^{(0)}\left(\vect{X}^{(0)}\right)$. The distribution over subsequent states can be defined using the chain dynamics as:
+\[p^{(t+1)}\left(\vect{X}^{(t+1)}=\vect{x}'\right)=\Sum_{\vect{x}\in Val(\vect{X})}p^{(t)}\left(\vect{X}^{(t)}=\vect{x}\right)\mathcal{T}(\vect{x}\rightarrow\vect{x}')\]
+The probability of being in a certain state $\vect{x}$ at time $t$ is the sum of the probabilities of being in any possible state $\vect{x}'$ at time $t-1$ times the probability of a transition from $\vect{x}'$ to $\vect{x}$. \newline
+As the process converges, we expect that $p^{(t+1)}$ becomes close to $p^{(t)}$:
+\[p^{(t)}(\vect{x}')\approx p^{(t+1)}(\vect{x}')=\Sum_{\vect{x}\in Val(\vect{X})}p^{(t)}(\vect{x})\mathcal{T}(\vect{x}\rightarrow\vect{x}')\]
+At convergence, we expect to have reached an equilibrium distribution $\pi(\vect{X})$: the probability of being in a state is the same as that of transitioning into it from a random predecessor.
+\begin{definition}[Stationary Distribution]
+  A distribution $\pi(\vect{X})$ is said to be a stationary distribution for a Markov chain $\mathcal{T}$ if:
+  \[\pi(\vect{X}=\vect{x}')=\Sum_{\vect{x}\in Val(\vect{X})}\pi\left(\vect{X}=\vect{x}\right)\mathcal{T}\left(\vect{x}\rightarrow\vect{x}'\right)\]
+\end{definition}
+We are interested only in Markov Chains with a unique stationary distribution which is reachable from any starting distribution $p^{(0)}$. This can be guaranteed via various conditions, for example ergodicity. Notice that for a Markov Chain with a finite state space $Val(\vect{X})$, \textbf{regularity} is a sufficient and necessary condition. 
+\begin{definition}[Regularity]
+  A Markov chain is regular if there exists a number $k$ such that for all state pairs $\vect{x},\vect{x}'\in Val(\vect{X})$, the probability of getting from $\vect{x}$ to $\vect{x}'$ in exactly $k$ steps is greater than zero.  
+\end{definition}
+This can be proven via 2 conditions:
+\begin{itemize}
+  \item It is possible to get from any state to any other state using a positive probability path in the state graph;
+  \item For every state $\vect{x}$ there is a positive probability of transitioning from $\vect{x}$ to $\vect{x}$ in one step (self loop).
+\end{itemize}
+\myparagraph{Markov Chains for Graphical Models}
+The typical use is estimating the probability of a certain instatiation of $\vect{x}$ of the variables $\vect{X}$ given some evidence $\vect{E}=\vect{e}$. This requires sampling from the posterior distribution $P(\vect{X}\vert\vect{E}=\vect{e})$. We wish to define a chain for which $P(\vect{X}\vert\vect{E}=\vect{e})$ is the stationary distribution. \newline
+States in the chain should be the subset of all possible instatiations which is consistent with the evidence $\vect{e}$:
+\[\vect{x}\in Val(\vect{X}):\vect{x}_{\vect{E}}=\vect{e}\]
+A simple transition model that we can think consists in updating variables in $\widehat{\vect{X}}=\vect{X}-\vect{E}$ one at a time. Such model can be seen as made of a set of $k=\vert\widehat{\vect{X}}\vert$ local transition model $\mathcal{T}_i$, one for each variable $X_i\in\widehat{\vect{X}}$. Let $\vect{U}_i=\vect{X}-X_i$ and let $\vect{u}_i$ be a possible instatiation of $\vect{U}_i$; then the local transition model $\mathcal{T}_i$ defines transitions between states $(\vect{u}_i, x_i)$ and $(\vect{u}_i, x_i')$:
+\[\mathcal{T}_i:(\vect{u}_i, x_i)\mapsto (\vect{u}_i, x_i') \]
+By defining a transition as a sequence of $k$ local transitions, one for each variable $X_i$, we obtain a homogeneous, i.e., not time-dependent, global transition model. 
+\myparagraph{Gibbs Sampling}
+Gibbs sampling is an efficient and effective simple Markov chain for factored state spaces (like the ones in graphical models). \newline
+Local transitions $\mathcal{T}_i$ are defined "forgetting" about the value of $X_i$ in the current state: this allows to sample a new value according to the posterior probability of $X_i$ given the rest of the current state:
+\[\mathcal{T}_i\left((\vect{u}_i,x_i)\mapsto(\vect{u}_i, x_i')\right)=P(x_i'\vert\vect{u}_i)\]
+The Gibbs chain samples a new state performing $k$ subsequent local moves and we only take samples after a full round of local moves. \newline
+Gibbs chains are ensured to be regular if the distribution is strictly positive: every value of $X_i$ given any instatiation of $\vect{U}_i$ has non-zero probability. If this is the case, then we can get from any state to any state in at most $k=\vert\widehat{\vect{X}}\vert$ local steps. \newline
+Gibbs chains have the desired posterior $P(\vect{X}\vert \vect{E}=\vect{e})$ as stationary distribution. \newline
+To generate samples from the correct posterior distribution, we need to wait until the Markov chain has converged to the stationary distribution. Once at convergence, all subsequent samples could be used to estimate the desired probability. \newline
+Mind though that consecutive samples are definitely not independent: a possible approach consists of letting an interval of $d$ samples before collecting the next sample. 
+%
+%
+%CPD=Conditional Probability Distribution
+\section{Learning in Graphical Models}
+We'll see how to apply what we have seen for parameters learning to Bayesian networks. \newline
+We are going to assume that the structure of the model is given and that we are also given a dataset of examples $\mathcal{D}=\{\vect{x}(1),\hdots,\vect{x}(N)\}$. Each example $\vect{x}(i)$ is a configuration for all \textit{complete data} or some \textit{incomplete data} variables in the model. \newline
+As said, our goal is to estimate the parameters of the model, in form of conditional probability distributions (CPD), from the data. 
+The simplest approach is to learn the parameters by maximizing the \textit{likelihood} of the data:
+\[\vect{\theta}^{\text{max}}=\argmax{\vect{\theta}}P(\vect{D}\vert\vect{\theta})=\argmax{\vect{\theta}}\mathcal{L}(\mathcal{D},\vect{\theta})\]
+Bayesian Network can be used not only to represent configuration of variables, but also to reason about what we want to learn. Suppose we have a simple graph with tail to tail connections and a dataset of $N$ examples, which can be specified by representing the network $N$ times, where each copy refers to the network for a certain example: 
+\begin{center}
+  \includegraphics[width=0.6\linewidth]{LearningBN}
+\end{center}
+The parameters $\vect{\theta}$ of the network are the ones in blue, and they are connected to the nodes that depend on the parameters. Now we can compute the likelihood as follows since the examples are independent given $\vect{\theta}$:
+\[P(\mathcal{D}\vert \vect{\theta})=\Prod_{i=1}^{N}P(\vect{x}(i)\vert\vect{\theta})\]
+Then if we consider the factorization of the Bayesian Network we have
+\[P(\mathcal{D}\vert\vect{\theta})=\Prod_{i=1}^N\Prod_{j=1}^mP(\vect{x}_j(i)\vert \text{pa}_j(i),\vect{\theta})\]
+As it's possible to see from the previous graph, if, for instance, we'd want to compute the distribution of $\vect{\theta}_{3\vert 1}$, there is no reason for which we should also keep in consideration $x_2(2)$ since they are not connected:
+\[P(\mathcal{D}\vect{\theta})=\Prod_{i=1}^N\Prod_{j=1}^mP(\vect{x}_j(i)\vert \text{pa}_j(i),\vect{\theta}_{X_j\vert\text{pa}_j}\]
+Giving the disjoint conditional probability distribution. \newline
+The parameters of CPD can be estimated independently, the estimate of the parameter $X_j$ by the maximum likelihood method is its maximum value:
+\[\vect{\theta}^{\text{max}}_{X_j\vert\Pa{j}}=\argmax{\vect{\theta}_{X_j\vert \Pa{j}}}\Prod_{i=1}^NP(\vect{x}_j(i)\vert \Pa{j}(i),\vect{\theta}_{X_j\vert\Pa{j}})\]
+The second part is nothing but the likelihood of the parameters and the dataset: 
+\[\vect{\theta}^{\text{max}}_{X_j\vert\Pa{j}}=\argmax{\vect{\theta}_{X_j\vert \Pa{j}}}\Prod_{i=1}^NP(\vect{x}_j(i)\vert \Pa{j}(i),\vect{\theta}_{X_j\vert\Pa{j}})=\mathcal{L}(\vect{\theta}_{X_j\vert\Pa{j}},\mathcal{D})\]
+A discrete CPD $P(X\vert \vect{U})$ can be represented as a table with:
+\begin{itemize}
+  \item A number of rows equal to the number $\Val{X}$ of configurations for $X$;
+  \item A number of columns equal to the number $\Val{\vect{U}}$ of configurations for its parents $\vect{U}$;
+  \item Each table entry $\theta_{x\vert\vect{u}}$ indicating the probability of a specific configuration $X=x$ and its parents $\vect{U}=\vect{u}$
+\end{itemize}
+Let's say we have this table sui fogli. allora possiamo massimizzare per ogni colonna quindi
+\begin{center}
+	%$\displaystyle argmax_{\theta_{T\vert T}, \theta_{F\vert T}}=\Pi_{i=x_2(i)=T}P(x_2(i)\vert x_2(i)=T, \theta_{T\vert T}, \theta_{F\vert T}$
+\end{center}
+E poi l'altra per l'altra colonna... \newline
+Il numero di colonne è il prodotto di tutti i possibili padri per il numero di possibili valori che assume. Vedi quaderno 
 
 
-Dato un nodo $x_i$, possiamo scrivere il messaggio in uscita $\mu_{\alpha}(x_{i+1})$ come:
-\[\mu_{\alpha}(x+1)=\Sum_{X_i}P(x_{i+1}\vert x_i)\mu_\alpha(x_i)\]
-Quindi possiamo scrivere il messaggio $\mu_{f_i\rightarrow x}(x)$ come: 
-\[ \mu_{f\rightarrow x}(x)=\Sum_{x_i...x_m}f(x_1, ..., x_m)\Pi_{x_f\in}\]
-Possiamo vedere che sia se il messaggio è da un factor a un nodo, sia che il messaggio sia da un nodo a un factor, si tratta comunque di una funzione del nodo. \newline 
-vedi fogli che forse si capisce qualcosa di più
+
+
+
+
 
 
