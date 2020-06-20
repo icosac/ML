@@ -20,7 +20,13 @@
 
 %Probability
 \newcommand{\prob}[1]{\text{Pr}[#1]}
-\newcommand{\E}[1]{\text{E}[#1]} 
+\newcommand{\E}[2][]{%
+  \ifblank{#1}{%
+    \text{E}\left[#2\right] 
+  }{%
+    \text{E}_{#1}\left[#2\right] 
+  }
+}
 \newcommand{\Var}[1]{\text{Var}[#1]}
 \newcommand{\Cov}[1]{\text{Cov}[#1]}
 \newcommand{\argmax}[1]{\text{argmax}_{#1}}
@@ -33,3 +39,4 @@
 \newcommand{\neigh}[0]{\text{ne}}
 \newcommand{\msg}[3]{\mu_{#1\rightarrow #2}(#3)}
 \newcommand{\Pa}[1]{\text{Pa}_{#1}} 
+\newcommand{\Val}[1]{\text{Val}\left({#1}\right)} 

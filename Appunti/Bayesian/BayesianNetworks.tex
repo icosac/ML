@@ -925,16 +925,148 @@ The second part is nothing but the likelihood of the parameters and the dataset:
 \[\vect{\theta}^{\text{max}}_{X_j\vert\Pa{j}}=\argmax{\vect{\theta}_{X_j\vert \Pa{j}}}\Prod_{i=1}^NP(\vect{x}_j(i)\vert \Pa{j}(i),\vect{\theta}_{X_j\vert\Pa{j}})=\mathcal{L}(\vect{\theta}_{X_j\vert\Pa{j}},\mathcal{D})\]
 A discrete CPD $P(X\vert \vect{U})$ can be represented as a table with:
 \begin{itemize}
-  \item A number of rows equal to the number $\Val{X}$ of configurations for $X$;
-  \item A number of columns equal to the number $\Val{\vect{U}}$ of configurations for its parents $\vect{U}$;
+  \item A number of rows equal to the number $\Val{X}$ of configurations for $X$, that is as many rows as the number of states of $X$;
+  \item A number of columns equal to the number $\Val{\vect{U}}$ of configurations for its parents $\vect{U}$, that is as many columns as the number of possible parents times the number of the values that they can get;
   \item Each table entry $\theta_{x\vert\vect{u}}$ indicating the probability of a specific configuration $X=x$ and its parents $\vect{U}=\vect{u}$
 \end{itemize}
-Let's say we have this table sui fogli. allora possiamo massimizzare per ogni colonna quindi
+Let's say we have the following table:
 \begin{center}
-	%$\displaystyle argmax_{\theta_{T\vert T}, \theta_{F\vert T}}=\Pi_{i=x_2(i)=T}P(x_2(i)\vert x_2(i)=T, \theta_{T\vert T}, \theta_{F\vert T}$
+  \begin{tabular}{c|c|c}
+    $X_2\vert X_1$&Y &N\\
+    \hline
+    R             &$\theta^{R\vert Y}$&$\theta^{R\vert N}$\\
+    \hline
+    G             &$\theta^{G\vert Y}$&$\theta^{G\vert N}$\\
+    \hline
+    B             &$\theta^{B\vert Y}$&$\theta^{B\vert N}$\\
+  \end{tabular}
 \end{center}
-E poi l'altra per l'altra colonna... \newline
-Il numero di colonne è il prodotto di tutti i possibili padri per il numero di possibili valori che assume. Vedi quaderno 
+Each cell of the table indicates the probability of a specific configuration, i.e., $P(X=x\vert\vect{U}=\vect{u})$, and the value $\theta^{X_2=x_2\vert X_1=x_1}$ inside the cell is the probability of finding such configuration in the dataset. Each column of the table containes a multinomial distribution of the value of $X$ for a certain configuration. Mind then that the sum of each value in column must return 1: $\Sum_X\theta^{X\vert\vect{U}}=1$. \newline
+If we were to replace $P(X(i)\vert\Pa{}(i))$ with $\theta_{x(i)\vert\vect{u}(i)}$ the local likelihood of a single conditional probability distribution becomes:
+\[
+  \begin{array}{ll}    
+    \mathcal{L}(\vect{\theta}_{X\vert\Pa{}},\mathcal{D})&=\Prod_{i=1}^NP(x(i)\vert\Pa{}(i),\vect{\theta}_{X\vert\Pa{j}})\\
+                                                        &=\Prod_{i=1}^N\theta_{x(i)\vert\vect{u}(i)}\\
+                                                        &=\Prod_{\vect{u}\in\Val{\vect{U}}}\left[\Prod_{x\in\Val{X}}\theta_{x\vert\vect{u}}^{N_{\vect{u},x}}\right]
+  \end{array}
+\]
+Where $N_{\vect{u},x}$ is the number of times the specific configuration $X=x,\vect{U}=\vect{u}$ was found in the data.
+Parents of different columns can be estimated independently. \newline
+For each multinomial distribution, zeroing the gradient of the maximum likelihood and considering the normalization constraint, we obtain:
+\[\theta_{x\vert\vect{u}}^{\text{max}}=\frac{\vect{N}_{\vect{u},x}}{\Sum_X\vect{N}_{\vect{u},x}}\]
+The maximum likelihood parameters are simply the fraction of times in which the specific configuration was observed in the data.
+%
+%
+\subsection{Adding Prior}
+Machine learning estimations tend to overfit the training set, since all the configurations not appearing in the training set will receive zero probability. \newline
+A common approach consists of combining machine learning with a prior probability on the parameters, achieving a maximum-a-posteriori estimate:
+\[\vect{\theta}^{\text{max}}=\argmax{\vect{\theta}}P(\mathcal{D}\vert\vect{\theta})P(\vect{\theta})\]
+%
+\subsubsection{Dirichlet Priors}
+The conjugate prior for a multinomial distribution is a Dirichlet distribution with parameters $\alpha_{x\vert\vect{u}}$ for each possible value of $x$. \newline
+The resulting maximum-a-posteriori estimate is:
+\[\theta_{x\vert\vect{u}}=\frac{\vect{N}_{\vect{u},x}+\alpha_{x\vert\vect{u}}}{\Sum_x\left(\vect{N}_{\vect{u},x}+\alpha_{x\vert\vect{u}}\right)}\]
+The prior is like having observed $\alpha_{x\vert\vect{u}}$ imaginary samples with configuration $\vect{X}=\vect{x},\vect{U}=\vect{u}$.
+%
+%
+\subsection{Incomplete data}
+With incomplete data, some of the examples miss evidence on some of the variables. Counting the occurrences different configurations cannot be computed if not all data are observed. \newline
+The full Bayesian approach of integrating over missing variables is often intractable in practice, hence we need approximate methods to deal with the problem. \newline
+Usually the missing data are filled in with inference using known parameters: one computes the parameters with the maximum likelihood criteria (or with maximum-a-posteriori) and then the quality of the parameters can be improved by iterating and reaching convergence. An example is the Expectation-Maximization Algorithm. 
+%
+\subsection{Expectation-Maximization Algorithm}
+This algorithm is composed of two steps:
+\begin{itemize}
+  \item \textbf{E-step}: the expectation step. It consists in computing the expected sufficient statistics for the complete dataset, with expectation taken w.r.t. the joint distribution for $\vect{X}$ conditioned of the current value of $\vect{\theta}$ and the known data $\mathcal{D}$:
+    \[\E[P(\vect{X}\vert\mathcal{D},\vect{\theta})]{\vect{N}_{ijk}}=\Sum_{l=1}^nP(X_i(l)=x_k,\Pa{i}(l)=\text{pa}_j\vert\vect{X}_l,\vect{\theta})\]
+    Where $\vect{N}_{ijk}$ is the entry in the table of node $i$, row $j$ and column $k$. \newline
+    If $X(l)$ and $\Pa{i}(l)$ are observed for $\vect{X}_l$, then the expected value is either zero or one. Otherwise we need to run Bayesian inference to compute probabilities from observed variables. 
+  \item \textbf{M-step}: the maximization step. It consists in computing the parameters maximizing likelihood of the complete dataset $\mathcal{D}_c$ using expected counts:
+    \[\vect{\theta}^*=\argmax{\vect{\theta}}P(\mathcal{D}_c\vert\vect{\theta})\]
+    which for each multinomial parameter evaluates to:
+    \[\theta_{ijk}^*=\frac{\E[P(\vect{X}\vert\mathcal{D},\vect{\theta})]{\vect{N}_{ijk}}}{\Sum_{k=1}^{r_i}\E[P(\vect{X}\vert\mathcal{D},\vect{\theta}]{\vect{N}_{ijk}}}\]
+    Notice that maximum likelihood estimation can be replaced by maximum-a-posteriori estimation giving:
+    \[\theta_{ijk}^*=\dfrac{\alpha_{ijk}+\E[P(\vect{X}\vert\mathcal{D},\vect{\theta},S]{\vect{N}_{ijk}}}{\Sum_{k=1}^{r_i}\E[P(\vect{X}\vert\mathcal{D},\vect{\theta}]{\vect{N}_{ijk}}}\]
+\end{itemize}
+%
+%
+%
+\section{Naïve Bayes Classifier}
+Each instance $x$ is described by a conjunction of attribute values $<a_1,\hdots, a_m>$. The target function can take any value from a finite set $\mathcal{Y}$. \newline
+The task is predicting the maximum-a-posteriori target value given the instance:
+\[
+  \begin{array}{ll}
+    \vect{y}^*=\argmax{y_i\in\mathcal{Y}}P(y_i\vert x)&=\argmax{y_i\in\mathcal{Y}}\dfrac{P(a_1,\hdots,a_m\vert y_i)P(y_i)}{P(a_1,\hdots,a_m)}\\
+                                                      &=\argmax{y_i\in\mathcal{Y}}P(a_1,\hdots,a_m\vert y_i)P(y_i)
+  \end{array}
+\]
+Class conditional probabilities $P(a_1,\hdots,a_m\vert y_i)$ are hard to learn, as the number of terms is equal to the number of possible instances times the number of target values. We can then simplify the assumptions by assuming that the attribute values are independent of each other given the target value:
+\[P(a_1,\hdots, a_m\vert y_i)=\Prod_{j=1}^mP(a_j\vert y_i)\]
+So a good estimator is:
+\begin{equation}
+  y^*=\argmax{y_i\in\mathcal{Y}}\Prod_{j=1}^mP(a_j\vert y_i)P(y_i)
+\end{equation}
+%
+%
+\subsection{Single Distribution Case}
+Assume that all attribute values come from the same distribution. The probability of an attribute value given the class can be modeled as a multinomial distribution over the $K$ possible values:
+\[P(a_j\vert y_i=\Prod_{k=1}^K\theta_{ky_i}^{z_k(a_j)}\]
+%
+%
+\subsection{Parameters Learning}
+Target priors $P(y_i)$ can be learned as the fraction of training set instances having each target value. \newline
+The maximum-likelihood estimate for the parameter $\theta_{kc}$, that is the probability of value $v_k$ given class $c$) is the fraction of times the value was observed in training examples of class $c$:
+\[\theta_{kc}=\frac{N_{kc}}{N_c}\]
+Assume a Dirichlet prior distribution (with parameters $\alpha_{1c},\hdots,\alpha_{Kc}$) for attribute parameters. The posterior distribution for attribute parameters is again a multinomial:
+\[\theta_{kc}=\frac{\vect{N}_{kc}+\alpha_{kc}}{\vect{N}_c+1\alpha_c}\]
+%
+%
+\subsection{Example -- Text Classification}
+The task is to classify documents in one of $C$ possible classes. Each document is represented as the bag-of-words it contains, the position of them is not important. Let $V$ be the vocabulary of all possible words and a dataset of labeled documents $\mathcal{D}$ is available. \newline
+We shall first use Naive Bayes to learn: we'll compute the prior probabilities of classes as:
+\[P(y_i)=\frac{\vert \mathcal{D}_i\vert}{\vert \mathcal{D}\vert}\]
+Then we'll model the attributes with a multinomial distribution with $K=\vert V\vert$ possible states (words). At last we'll compute the probability of work $w_k$ given class $c$ as the fraction of times the word appear in documents of class $y_i$, wr.t. all words in documents of class $c$:
+\[\theta_{kc}=\dfrac{\Sum_{\vect{X}\in\mathcal{D}_c}\Sum_{j=1}^{\vert\vect{X}\vert}z_k(x[j])}{\Sum_{\vect{x}\in\mathcal{D}_c}\vert\vect{X}\vert}\]
+Then the classification is done as follows:
+\[
+  \begin{array}{ll}
+    \vect{y}^*&=\argmax{y_i\in\mathcal{Y}}\Prod_{j=1}^{\vert\vect{X}\vert}P(x[j]\vert y_i)P(y_i)\\
+              &=\argmax{y_i\in\mathcal{Y}}\Prod_{j=1}^{\vert\vect{X}\vert}\theta_{ky_i}^{z_k(x[j])}\dfrac{\vert\mathcal{D}_i\vert}{\vert\mathcal{D}\vert}
+  \end{array}
+\]
+%
+%
+\subsection{Simplification}
+Note that we are making the simplifying assumption that all attributer values come from the same distribution. If this were not to be the case, then attributes from different distributions have to be considered separately for parameter estimation. \newline
+For example assume that each instance $x$ is represented as a vector of $l$ attributes. Assume that the $j^{th}$ attribute $(j\in[1,l])$ can take $\{v_{j1},\hdots,v_{jK_j}\}$ possible values. The parameter $\theta_{jkc}$ representing the probability of observing value $v_{jk}$ for the $j^{th}$ attribute given class $c$ is estimated as:
+\[\theta_{jkc}=\dfrac{\Sum_{\vect{X\in\mathcal{D}_c}}z_{jk}(x[j])}{\vert\mathcal{D}_c\vert}\]
+%
+%
+\subsection{Naïve Bayes Recap}
+It's possible to describe this classifier as a Bayesian Network where the class to be predicted is dependent on all the other:
+\[\vect{y}^*=\argmax{y_i\in\mathcal{Y}}P(y_i\vert x)=\argmax{y_i\in\mathcal{Y}}\dfrac{P(\vect{X}\vert Y)P(Y)}{P(\vect{X})}\]
+where:
+\begin{itemize}
+  \item $P(Y)=\frac{\vert Y_n\vert}{\vert Y}$ computes the number of elements in a class;
+  \item $P(\vect{X}\vert Y)$ its a likelihood measure using the $k$ nearest samples in the training set.
+  \item $P(\vect{X},Y)$ it's the a posteriori probability to classify the sample.
+\end{itemize}
+The estimated output is the one that gives the bigger posteriori probability:
+\[\vect{y}^*=\argmax{y_i\in\mathcal{Y}}P(\vect{X}\vert Y)P(Y)=\argmax{y_i\in\mathcal{Y}}\Prod_{j=1}^mP(a_j\vert y_i)P(y_i)\]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

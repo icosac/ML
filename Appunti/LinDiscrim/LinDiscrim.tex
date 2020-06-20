@@ -1,0 +1,45 @@
+\data{07/11/2019}
+\chapter{Discriminative vs generative}
+If you go with generative you need to model all the $x$s which can be pretty difficult. For example if we wanted to model a whole website modelling all the links ecc with be really difficult, expecially if for example we'd wanted to know the argument of the site. For doing this we can use a discriminative model where we only care about the boundaries. This is also a downside of this approach: if the inputs are really different then boundaries cannot be extracted. For this reason a discriminative model cannot 6:20 and it's not used to generate new samples. 
+\section{Linear discriminative model}
+It uses a linear function such as:
+\begin{center}
+	$\displaystyle f(x)$
+\end{center}
+Where $W_0$ is called the bias or threshold. \newline
+This is the simplest function, which means also not the best one, but in most of the cases is perfect.\newline
+For classification we take the sign of the function: is negative is one thing, if positive the other, otherwise if 0, then is the decision boundary, that is the set of points for which the discriminant function is 0. \newline
+The decision function is in reality a decision hyperplane. 
+\chapter{Biological motivation}
+The linear classifier, perceptron, take source from the brain which is a colleciton of neurons. These are made out of a soma circondato da dentriti e il più lungo di questi, detto axon, che si collega ad altri neuroni tramite le sinpasi. \newline
+Electrochemical eractions allows to propagate the signal in the brain. \newline
+A perceptron as a set of inputs, for example the features, which get maximised by weights and then summed and finally through an activation function, it mimics the activation of the neuron so it's a threshold. This is the simpler formulation for a linear binary classifier.\newline
+A linear classifier (perceptron) can linearly separate classes that are linearly separable, for example boolean function. In this case the standard functions such as AND and OR are linearly separable: two feature can be either 1 or 0. In the OR the result can be either positive or negative and the result is then easily separable by a line. The same can be said for the AND. The same cn be said for the not which is just a value and for that a threshold again. Let's consider the XOR, then dividing by an hyperplane is not possibile and for this, this is not a linear separable function \ins{foto}. To solve the XOR we can use a multy level perceptron. We know that it corresponds to $A\wedge not B)\vee (not A\wedge B)$ so this can be computed separately first and then solved. The structure is the one in \ins{foto}. We know that in principle every boolean formula can be learned by a two layer perceptron since all the formula can be expressed in conjunctive or disjunctive normal formula. Why then do we need multi strata deep networks? Because the conjunctive, disjunctive normal formulas are exponentially in term of number of neurones. \newline
+In the picture of the slide perceptron there is a bias which is like an additional input which is always zero and one more wight. For this we can write $f(x)$ as augmented vectors like in slide. From now one all the formula will include bias and weight without specifying.\newline
+The weights are learned from the data. We decide an error function, what we call a training loss which usually is the sum over the training exame of the loss encorred in predicting something while the actual value was something else. There is a problem of overfitting since I could just memorise training example. This acutally is not a problem with linear classifiers, but with more difficutl system this is not sufficient. \newline
+Now suppose what king of loss function to use, then we can do error minimisation by changing the weights. What we can always do is gradient descent. Let's suppose we have a singular parameter and the error function over the parameter is the one in \ins{foto}. To minimise it, we start from x=0, we compute the gredient and then go opposite of the gradient (otherwise we'd maximise). Then we compute the gradient again and so on until we reach the minimum. The learning rate $\eta$ tells us how much we need to move each time. With gradient descent we reach a local minimum. \newline
+In perceptron we use a confident margin: we do not take the sign of $f(x)$ but we multiply $f(x)$ with y, so the bigger the result the bigger the error.\newline 
+This is called batch training because every step we compute the error on the entire training set. There is also a version where we take on example each time and compute the error. If it was correctly classified then ok, otherwise we compute the gradient. This is called stochastic perceptron and is usually pretty fast. In some cases we can use only stochastic since the dataset would be too big, moreover it allows to avoid local minima since each time the gradient function is a little different.\newline
+Con il gradiente praticamente si gira pian piano finchè tutti gli errori non scompaiono.\newline
+\section{Percpetron regression}
+With linear predictors we can also to regression other the classification as done now. \newline
+Let's say we have $n$ exmaple, and that each example has $\vert D\vert$ feature. Let's take each example and put them into a matrix as columns. The desired output is $n$ dimentional vector of real values. Given the function:
+\begin{center}
+	$\displaystyle $
+\end{center}
+The perfect regression would be:
+\begin{center}
+	$\displaystyle \forall i, y_i=w^Tx_i$
+\end{center}
+But since we have matrix:
+\begin{center}
+	$\displaystyle Xw=y$
+\end{center}
+Which linear system can be solved as:
+\begin{center}
+	$\displaystyle w=X^{-1}y$
+\end{center}
+But this doesn't work since $X$ is not revertible in many cases. If we are lucky we are going to have more example than features, otherwise just don't. This means that there is no exact solution, so we cannot do this, but rather we should forget about having a right solution, but trying to minimise the error, which is the square difference of $f(x)$ and $y$:
+\begin{center}
+	$\displaystyle (xw-y)^T(Xw-y)$
+\end{center}
