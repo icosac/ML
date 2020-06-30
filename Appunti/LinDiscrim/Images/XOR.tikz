@@ -1,0 +1,14 @@
+\begin{tikzpicture}
+  \begin{axis}[
+    xmin=-0.05,   xmax=1.5,
+    ymin=-0.05,   ymax=1.5,
+    xtick={0,1},
+    ytick={0,1},
+    axis lines=middle
+  ]
+    \addplot [mark=none, red, domain=-0.5:1.5] {x};
+    \addplot [only marks,mark=o,ultra thick] coordinates { (0,0) (1,1) }; 
+    \addplot [only marks,mark=+,ultra thick] coordinates { (1,0) (0,1) }; 
+    \legend {,Negative, Positive}
+  \end{axis}
+\end{tikzpicture}
