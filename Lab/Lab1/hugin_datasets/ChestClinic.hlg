@@ -1,4 +1,4 @@
-Thu Oct 31 12:43:59 2019
+Mon Jul  6 09:55:45 2020
 
 
 Moral links:
@@ -23,24 +23,24 @@ Triangulating prime component with 4 members:
 
 Triangulating prime component with 3 members:
     B, D, E
-This component is a clique of cost 12
+This component is a clique of cost 8
 
 Triangulating prime component with 2 members:
     X, E
 This component is a clique of cost 4
 
 
-Total cost of triangulation for all prime components is 44
+Total cost of triangulation for all prime components is 40
 
 
 Elimination sequence:
 
     A
-    D
-    B
     T
     L
     S
+    D
+    B
     X
     E
 
@@ -51,21 +51,21 @@ Clique 6, 2 members, table size = 4:
     E, X
 
 Clique 5, 3 members, table size = 8:
-    E, S, L
-
-Clique 4, 3 members, table size = 8:
-    E, L, T
-
-Clique 3, 2 members, table size = 4:
-    T, A
-
-Clique 2, 3 members, table size = 8:
-    E, S, B
-
-Clique 1, 3 members, table size = 12:
     E, B, D
 
-Total clique table size: 44
+Clique 4, 3 members, table size = 8:
+    E, B, S
+
+Clique 3, 3 members, table size = 8:
+    E, S, L
+
+Clique 2, 3 members, table size = 8:
+    E, L, T
+
+Clique 1, 2 members, table size = 4:
+    T, A
+
+Total clique table size: 40
 
 
 The junction forest:
@@ -76,35 +76,31 @@ Cliques 5 and 6 linked, separator has 1 member and table size = 2:
     E
 
 Cliques 4 and 5 linked, separator has 2 members and table size = 4:
-    E, L
+    E, B
 
-Cliques 3 and 4 linked, separator has 1 member and table size = 2:
-    T
-
-Cliques 2 and 5 linked, separator has 2 members and table size = 4:
+Cliques 3 and 4 linked, separator has 2 members and table size = 4:
     E, S
 
-Cliques 1 and 2 linked, separator has 2 members and table size = 4:
-    E, B
+Cliques 2 and 3 linked, separator has 2 members and table size = 4:
+    E, L
+
+Cliques 1 and 2 linked, separator has 1 member and table size = 2:
+    T
 
 
 Assignment of potentials to cliques:
 
     Node X assigned to clique 6
-    Node B assigned to clique 2
-    Node D assigned to clique 1
-    Node A assigned to clique 3
-    Node S assigned to clique 5
-    Node L assigned to clique 5
-    Node T assigned to clique 3
-    Node E assigned to clique 4
+    Node B assigned to clique 4
+    Node D assigned to clique 5
+    Node A assigned to clique 1
+    Node S assigned to clique 4
+    Node L assigned to clique 3
+    Node T assigned to clique 1
+    Node E assigned to clique 2
 
 
 Checking conditional probability potentials:
-
-Warning: Conditional distributions for D sum to different values:
-    min = 0.3
-    max = 2.7
 
     No errors found
 
@@ -120,9 +116,8 @@ Beliefs for chance nodes:
 	no         0.55
 
     D:
-	yes        0.333333
-	State 2    0.333333
-	State 3    0.333333
+	yes        0.435971
+	no         0.564029
 
     A:
 	yes        0.01

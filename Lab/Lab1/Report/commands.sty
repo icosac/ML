@@ -1,0 +1,42 @@
+%General
+\newcommand{\ml}[0]{machine learning~}
+\newcommand{\Ml}[1]{Machine learning~}
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}
+\newcommand{\ins}[1]{{\Huge#1}}
+\newcommand{\Sum}[0]{\displaystyle\sum}
+\newcommand{\Prod}[0]{\displaystyle\prod}
+\newcommand{\abs}[1]{\vert #1 \vert}
+\newcommand{\myfrac}[2]{{}^{#1}/_{#2}}
+\let\oldexp\exp
+\renewcommand{\exp}[1]{\oldexp{\left\{#1\right\}}}
+\newcommand{\data}[1]{\chapter{#1}}
+\newcommand{\mc}[3]{\multicolumn{#1}{#2}{#3}}
+\newcommand{\sign}[1]{\text{sign}(#1)} 
+%Linear algebra
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\dprod}[2]{\left\langle\vect{#1}, \vect{#2}\right\rangle}
+\newcommand{\dprodd}[1]{\left\langle #1 \right\rangle}
+
+%Probability
+\newcommand{\prob}[1]{\text{Pr}[#1]}
+\newcommand{\E}[2][]{%
+  \ifblank{#1}{%
+    \text{E}\left[#2\right] 
+  }{%
+    \text{E}_{#1}\left[#2\right] 
+  }
+}
+\newcommand{\Var}[1]{\text{Var}[#1]}
+\newcommand{\Cov}[1]{\text{Cov}[#1]}
+\newcommand{\argmax}[1]{\text{argmax}_{#1}}
+
+%Bayesian
+\newcommand{\dsep}[1]{\text{dsep}(#1)}
+\newcommand{\BN}[0]{Bayesian Network~}
+\newcommand{\ND}[0]{NonDecendants}
+\newcommand{\NDI}[0]{\textit{\ND}~}
+\newcommand{\neigh}[0]{\text{ne}}
+\newcommand{\msg}[3]{\mu_{#1\rightarrow #2}(#3)}
+\newcommand{\Pa}[1]{\text{Pa}_{#1}} 
+\newcommand{\Val}[1]{\text{Val}\left({#1}\right)} 
